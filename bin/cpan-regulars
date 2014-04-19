@@ -1,0 +1,190 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use CPAN::ReleaseHistory;
+use DateTime;
+use Template;
+use 5.010;
+
+my $template           = Template->new({ INCLUDE_PATH => 'templates' });
+my $FIRST_RELEASE_TIME = 801459900;
+my $DAY_IN_SECONDS     = 24 * 60 * 60;
+my %bins = (
+    day   => [],
+    week  => [],
+    month => [],
+);
+my %counts;
+
+build_bins();
+process_cpan_releases();
+find_current_chains();
+find_longest_chains();
+
+sub build_bins
+{
+    my $time = time();
+    my ($week_number, $week_year);
+    my ($previous_date, $previous_ym, $previous_week);
+    my ($date, $ym, $week);
+
+    while ($time > $FIRST_RELEASE_TIME) {
+        my ($ym, $week, $date) = time_to_bins($time);
+
+        push(@{ $bins{day} },   $date)  if !defined($previous_date) || $previous_date ne $date;
+        push(@{ $bins{week} },  $week)  if !defined($previous_week) || $previous_week ne $week;
+        push(@{ $bins{month} }, $ym)    if !defined($previous_ym)   || $previous_ym ne $ym;
+
+        $previous_ym   = $ym;
+        $previous_week = $week;
+        $previous_date = $date;
+        $time -= $DAY_IN_SECONDS;
+    }
+}
+
+sub time_to_bins
+{
+    my $time        = shift;
+    my @ts          = gmtime($time);
+    my $year        = $ts[5] + 1900;
+    my $month       = $ts[4] + 1;
+    my $day         = $ts[3];
+    my $date        = sprintf('%.4d-%.2d-%.2d', $year, $month, $day);
+    my $ym          = sprintf('%.4d-%.2d', $year, $month);
+    my $dt          = DateTime->from_epoch(epoch => $time);
+    my $week_number = $dt->strftime('%U');
+    my $week_year   = $year;
+
+    if ($week_number == 0) {
+        $week_year--;
+        $week_number = final_week_number($week_year);
+    }
+    my $week = sprintf("%.4d-W%.2d", $week_year, $week_number);
+
+    return ($ym, $week, $date);
+}
+
+sub final_week_number
+{
+    my $year = shift;
+    state %final_week_number;
+
+    if (not exists $final_week_number{$year}) {
+        my $dt = DateTime->new(year => $year, month => 12, day => 31, hour => 12, minute => 0, second => 0);
+        $final_week_number{$year} = $dt->strftime('%U');
+    }
+
+    return $final_week_number{$year};
+}
+
+sub process_cpan_releases
+{
+    my $iterator = CPAN::ReleaseHistory->new()->release_iterator(well_formed => 1);
+
+    while (my $release = $iterator->next_release) {
+        my $user               = $release->distinfo->cpanid;
+        my ($ym, $week, $date) = time_to_bins($release->timestamp);
+
+        $counts{month}->{$user}->{$ym}++;
+        $counts{week}->{$user}->{$week}++;
+        $counts{day}->{$user}->{$date}++;
+    }
+
+}
+
+sub find_current_chains
+{
+    my %chain;
+    my $data;
+    my @lists;
+
+    foreach my $category (qw(month week day)) {
+        my %chain;
+        my %safe;
+        my @entries;
+
+        USER:
+        foreach my $user (keys %{ $counts{$category} }) {
+            $data = $counts{$category}->{$user};
+            BIN:
+            foreach my $bin (@{ $bins{$category} }) {
+                if (!exists($data->{$bin})) {
+
+                    # if this is the current time slot,
+                    # then don't break the chain if they haven't released yet
+                    next BIN if $bin eq $bins{$category}->[0];
+
+                    next USER;
+                }
+                $safe{$user} = 1 if $bin eq $bins{$category}->[0];
+                $chain{$user}++;
+            }
+        }
+        @entries = map { { user => $_, count => $chain{$_}, safe => $safe{$_} // 0 } }
+                   grep { $chain{$_} > 2 }
+                   sort { $chain{$b} <=> $chain{$a} }
+                   keys %chain;
+        push(@lists, { title => "once a $category", entries => \@entries });
+    }
+    $template->process('top10-page.html',
+                       { lists => \@lists, limit => 10, chapter => 'current', section => 'top10' },
+                       'index.html');
+    $template->process('top10-page.html',
+                       { lists => \@lists, limit => 250, chapter => 'current', section => 'top250' },
+                       'current-top250.html');
+}
+
+sub find_longest_chains
+{
+    my $data;
+    my @lists;
+
+    foreach my $category (qw(month week day)) {
+        my %chain;
+        my %safe;
+        my %active;
+        my @entries;
+
+        USER:
+        foreach my $user (keys %{ $counts{$category} }) {
+            my $first_bin;
+
+            $data = $counts{$category}->{$user};
+            my $length = 0;
+            BIN:
+            foreach my $bin (@{ $bins{$category} }) {
+                if (!exists($data->{$bin})) {
+                    if (!exists($chain{$user}) || $length > $chain{$user}) {
+                        $chain{$user} = $length;
+                        if (   defined($first_bin)
+                            && ($first_bin eq $bins{$category}->[0] || $first_bin eq $bins{$category}->[1]))
+                        {
+                            $safe{$user}   = 1 if $first_bin eq $bins{$category}->[0];
+                            $active{$user} = 1 if $first_bin eq $bins{$category}->[1];
+                        }
+                        else {
+                            delete $safe{$user};
+                            delete $active{$user};
+                        }
+                    }
+                    $length = 0;
+                    next BIN;
+                }
+                $length++;
+                $first_bin = $bin if $length == 1;
+            }
+        }
+        @entries = map { { user => $_, count => $chain{$_}, safe => $safe{$_} // 0, active => $active{$_} // 0 } }
+                   grep { $chain{$_} > 2 }
+                   sort { $chain{$b} <=> $chain{$a} }
+                   keys %chain;
+        push(@lists, { title => "once a $category", entries => \@entries });
+    }
+    $template->process('top10-page.html',
+                       { lists => \@lists, limit => 10, chapter => 'alltime', section => 'top10' },
+                       'alltime-top10.html');
+    $template->process('top10-page.html',
+                       { lists => \@lists, limit => 250, chapter => 'alltime', section => 'top250' },
+                       'alltime-top250.html');
+}
+
