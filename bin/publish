@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# our directories
+SRC=`readlink -f $(dirname $0)/..`
+DST=/tmp/cpan.io
+
+if [ ! -e $DST ] ; then mkdir -p $DST ; fi
+
+# generate the static pages
+wallflower \
+    --include $SRC/lib \
+    --destination $DST \
+    --application $SRC/bin/cpanio.cgi
+
+# copy them to the server
+rsync -avz --delete $DST cpan.io:www/
