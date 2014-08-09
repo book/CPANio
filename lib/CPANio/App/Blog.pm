@@ -8,6 +8,10 @@ use Text::Markdown 'markdown';
 sub dispatch_request {
     my ($self) = @_;
 
+    # check the configuration
+    my $dir = dir( $self->config->{blog_dir} );
+    die "blog_dir is not defined" if ! $dir;
+
     # various index pages
     sub (/)  { ... },
 
