@@ -1,4 +1,4 @@
-package CPANio::Web::Blog;
+package CPANio::App::Blog;
 
 sub run {
     my ( $class, $env ) = @_;

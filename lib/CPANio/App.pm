@@ -1,4 +1,4 @@
-package CPANio::Web;
+package CPANio::App;
 
 use Web::Simple;
 use Plack::Response;
@@ -13,10 +13,10 @@ sub dispatch_request {
         # each top-level directory is handled by a different module
         sub (/*/...) {
             my ( $self, $top, $env ) = @_;
-            eval { require "CPANio/Web/\u$top.pm" }
+            eval { require "CPANio/App/\u$top.pm" }
                 or return Plack::Response->new(404)->finalize;
 
-            sub (/|/*) { "CPANio::Web::\u$top"->run($env) }
+            sub (/|/*) { "CPANio::App::\u$top"->run($env) }
         },
 
         # not found
