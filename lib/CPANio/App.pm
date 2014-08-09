@@ -3,6 +3,8 @@ package CPANio::App;
 use Web::Simple;
 use Plack::Response;
 
+# cache the various handlers
+my %handler;
 
 # the top-level dispatcher
 sub dispatch_request {
@@ -13,10 +15,13 @@ sub dispatch_request {
         # each top-level directory is handled by a different module
         sub (/*/...) {
             my ( $self, $top, $env ) = @_;
-            eval { require "CPANio/App/\u$top.pm" }
-                or return Plack::Response->new(404)->finalize;
+            my $app = $handler{$top} ||= do {
+                eval { require "CPANio/App/\u$top.pm" }
+                    or return Plack::Response->new(404)->finalize;
+                "CPANio::App::\u$top"->to_psgi_app;
+            };
+            $app->($env);
 
-            "CPANio::App::\u$top"->to_psgi_app->($env);
         },
 
         # not found
