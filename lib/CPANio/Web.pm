@@ -1,7 +1,7 @@
 package CPANio::Web;
 
 use Web::Simple;
-use CPANio::Error;
+use Plack::Response;
 
 
 # the top-level dispatcher
@@ -13,17 +13,18 @@ sub dispatch_request {
         # each top-level directory is handled by a different module
         sub (/*/...) {
             my ( $self, $top, $env ) = @_;
-            eval { require "CPANio/Web/\u$top.pm" } or return error 404;
+            eval { require "CPANio/Web/\u$top.pm" }
+                or return Plack::Response->new(404)->finalize;
 
             sub (/|/*) { "CPANio::Web::\u$top"->run($env) }
         },
 
         # not found
-        sub () { error 404 }
+        sub () { Plack::Response->new(404)->finalize }
     },
 
     # any other method is an error
-    sub () { error 405 }
+    sub () { Plack::Response->new(405)->finalize }
 
 }
 
