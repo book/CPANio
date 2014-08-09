@@ -16,7 +16,7 @@ sub dispatch_request {
             eval { require "CPANio/App/\u$top.pm" }
                 or return Plack::Response->new(404)->finalize;
 
-            sub (/|/*) { "CPANio::App::\u$top"->run($env) }
+            "CPANio::App::\u$top"->to_psgi_app->($env);
         },
 
         # not found
