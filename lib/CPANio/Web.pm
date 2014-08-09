@@ -21,7 +21,7 @@ sub dispatch_request {
             my ( $self, $top, $env ) = @_;
             eval { require "CPANio/Web/\u$top.pm" } or return $response{404};
 
-            sub (/*) { "CPANio::Web::\u$top"->run($env) }
+            sub (/|/*) { "CPANio::Web::\u$top"->run($env) }
         },
 
         # not found
