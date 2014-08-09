@@ -1,4 +1,4 @@
-package CPANio::Web::Error;
+package CPANio::Error;
 
 use Exporter;
 our @ISA    = qw(Exporter);

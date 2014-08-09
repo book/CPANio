@@ -1,7 +1,7 @@
 package CPANio::Web;
 
 use Web::Simple;
-use CPANio::Web::Error;
+use CPANio::Error;
 
 
 # the top-level dispatcher
