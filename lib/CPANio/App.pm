@@ -18,7 +18,8 @@ sub dispatch_request {
             my $app = $handler{$top} ||= do {
                 eval { require "CPANio/App/\u$top.pm" }
                     or return Plack::Response->new(404)->finalize;
-                "CPANio::App::\u$top"->to_psgi_app;
+                "CPANio::App::\u$top"
+                    ->new( config => $self->config )->to_psgi_app;
             };
             $app->($env);
 
