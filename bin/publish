@@ -4,6 +4,22 @@
 SRC=`readlink -f $(dirname $0)/..`
 DST=/tmp/cpan.io
 
+# command-line options
+OPTS=`getopt --long clean "$0" -- "$@"`
+
+eval set "$OPTS"
+while : ; do
+    case "$1" in
+        --clean)
+            rm -rf $DST
+            ssh cpan.io rm -rf www/cpan.io/
+            shift ;;
+        *)
+            break ;;
+    esac
+done
+
+# make sure the local target directory exists
 if [ ! -e $DST ] ; then mkdir -p $DST ; fi
 
 # generate the static pages
