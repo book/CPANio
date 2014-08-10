@@ -3,6 +3,7 @@ package CPANio::App;
 use Web::Simple;
 use Plack::Response;
 use Template;
+use Path::Class;
 
 # cache the various handlers
 my %handler;
@@ -18,6 +19,19 @@ sub dispatch_request {
     # we're a static site, so we only do GET
     sub (GET) {
         my ($self) = @_;
+
+        # handler for static resources
+        sub (/**.*) {
+            my ( $self, $static, $env ) = @_;
+            my $static_dir = dir( $self->config->{static_dir} );
+            my $file = file( $static_dir, $static );
+
+            # compute the response
+            return if !-e $file;
+            return Plack::Response->new(403)->finalize
+                if !$static_dir->contains($file);
+            return [ 200, [], $file->openr ];
+        },
 
         # any .html will be wrapped in the default layout
         sub (.html) {
