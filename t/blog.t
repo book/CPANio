@@ -2,8 +2,8 @@ use Test::More;
 use CPANio::App::Blog;
 
 my @uri = (
-    [ 't',      '/blog/hello.html', qr/Hello, world!/ ],
-    [ 't/blog', '/hello.html',      qr/Hello, world!/ ],
+    [ 't/site',      '/blog/hello.html', qr/Hello, world!/ ],
+    [ 't/site/blog', '/hello.html',      qr/Hello, world!/ ],
 );
 
 for my $t (@uri) {
