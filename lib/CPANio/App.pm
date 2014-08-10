@@ -24,10 +24,10 @@ sub dispatch_request {
         sub (/**.*) {
             my ( $self, $static, $env ) = @_;
             my $static_dir = dir( $self->config->{static_dir} );
-            my $file = file( $static_dir, $static );
+            my $file = eval { file( $static_dir, $static )->resolve };
 
             # compute the response
-            return if !-e $file;
+            return if !$file;
             return Plack::Response->new(403)->finalize
                 if !$static_dir->contains($file);
             return [ 200, [], $file->openr ];
