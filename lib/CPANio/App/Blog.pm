@@ -20,8 +20,11 @@ sub dispatch_request {
     # a blog post to render
     sub (/**) {
         my ( $self, $post, $env ) = @_;
-        my $file = file( $self->config->{blog_dir}, $post . '.md' );
-        return Plack::Response->new(404)->finalize if !-e $file;
+        my $blog_dir = dir( $self->config->{blog_dir} );
+        my $file = eval { file( $blog_dir, $post . '.md' )->resolve };
+        return Plack::Response->new(404)->finalize if !$file;
+        return Plack::Response->new(403)->finalize
+            if !$blog_dir->contains($file);
 
         [   200,
             [ 'Content-type', 'text/plain' ],
