@@ -13,7 +13,7 @@ my $app = CPANio::App->new(
 # no methods other than GET allowed
 for my $method (qw( POST PUT DELETE HEAD )) {
     my $r = $app->run_test_request( $method => '/' );
-    is( $r->code, 405, "$method: Method Not Allowed" );
+    is( $r->code, 405, "$method => 405" );
 }
 
 # these request give various errors
