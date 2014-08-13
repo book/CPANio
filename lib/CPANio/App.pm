@@ -1,5 +1,6 @@
 package CPANio::App;
 
+use 5.010;
 use Web::Simple;
 use Plack::Response;
 use Template;
@@ -10,7 +11,23 @@ my %handler;
 
 # default configuration
 sub default_config {
-    ( ui => \"<html><body>\n[% content %]\n</body></html>", );
+    (   ui       => \"<html><body>\n[% content %]\n</body></html>",
+        base_dir => dir(),
+    );
+}
+
+sub BUILD {
+    my ($self) = @_;
+    my $config = $self->config;
+    my $base   = dir( $config->{base_dir} );
+
+    # generate the rest of the config from the defaults
+    $config->{"${_}_dir"} //= $base->subdir($_)
+        for qw( static blog templates );
+
+    $config->{template} //= Template->new(
+        INCLUDE_PATH => $config->{templates_dir},
+    );
 }
 
 # the top-level dispatcher
@@ -41,7 +58,7 @@ sub dispatch_request {
                 # do not deal with streams
                 return if ref $res->[2] ne 'ARRAY';
 
-                my $tt = Template->new;
+                my $tt = $self->config->{template};
                 $tt->process(
                     $self->config->{ui},
                     { content => join( '', @{ $res->[2] } ) },

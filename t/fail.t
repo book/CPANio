@@ -3,12 +3,7 @@ use Path::Class;
 use CPANio::App;
 
 my $dir = dir( 't', 'site' );
-my $app = CPANio::App->new(
-    config => {
-        static_dir => $dir->subdir('static'),
-        blog_dir   => $dir->subdir('blog')
-    }
-);
+my $app = CPANio::App->new( config => { base_dir => $dir } );
 
 # no methods other than GET allowed
 for my $method (qw( POST PUT DELETE HEAD )) {
