@@ -27,7 +27,8 @@ my @uri = (
 for my $t (@uri) {
     my ( $uri, $code ) = @$t;
     my $r = $app->run_test_request( GET => $uri );
-    is( $r->code, $code, "$uri => $code" );
+    is( $r->code, $code, "$uri => $code" )
+      or diag $r->content;
 }
 
 done_testing;
