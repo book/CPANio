@@ -4,10 +4,6 @@ use Path::Class;
 
 use CPANio::App;
 
-my $base   = dir($FindBin::Bin)->parent->subdir('site');
-my $config = {
-    static_dir => $base->subdir('static'),
-    blog_dir   => $base->subdir('blog'),
-};
+my $base = dir($FindBin::Bin)->parent->subdir('site');
 
-CPANio::App->new( config => $config )->run_if_script;
+CPANio::App->new( config => { base_dir => $base } )->run_if_script;
