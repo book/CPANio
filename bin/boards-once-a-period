@@ -5,6 +5,15 @@ use CPAN::ReleaseHistory;
 use DateTime;
 use Template;
 use 5.010;
+use FindBin;
+use Path::Class;
+use CPANio::Schema;
+
+my $base   = dir($FindBin::Bin)->parent->subdir('site');
+my $schema
+    = CPANio::Schema->connect(
+    "dbi:SQLite:dbname=" . $base->file("boards.sqlite"),
+    '', '', { AutoCommit => 1 } );
 
 my $template           = Template->new({ INCLUDE_PATH => 'templates' });
 my $FIRST_RELEASE_TIME = 801459900;
@@ -120,18 +129,27 @@ sub find_current_chains
                 $chain{$user}++;
             }
         }
-        @entries = map { { user => $_, count => $chain{$_}, safe => $safe{$_} // 0 } }
-                   grep { $chain{$_} > 2 }
-                   sort { $chain{$b} <=> $chain{$a} }
-                   keys %chain;
-        push(@lists, { title => "once a $category", entries => \@entries });
+
+        my $rank = 0;
+        my $prev = 0; # sentinel
+        @entries = map {
+                $rank++ if $chain{$_} != $prev;
+                $prev = $chain{$_};
+                {   contest => 'current',
+                    rank    => $rank,
+                    author  => $_,
+                    count   => $chain{$_},
+                    safe    => $safe{$_} // 0,
+                    active  => 1,
+                }
+            }
+            sort { $chain{$b} <=> $chain{$a} }
+            keys %chain;
+
+        my $rs = $schema->resultset("OnceA\u$category");
+        $rs->search( { contest => 'current' } )->delete();
+        $rs->populate( \@entries );
     }
-    $template->process('top10-page.html',
-                       { lists => \@lists, limit => 10, chapter => 'current', section => 'top10' },
-                       'index.html');
-    $template->process('top10-page.html',
-                       { lists => \@lists, limit => 250, chapter => 'current', section => 'top250' },
-                       'current-top250.html');
 }
 
 sub find_longest_chains
@@ -159,8 +177,10 @@ sub find_longest_chains
                         if (   defined($first_bin)
                             && ($first_bin eq $bins{$category}->[0] || $first_bin eq $bins{$category}->[1]))
                         {
-                            $safe{$user}   = 1 if $first_bin eq $bins{$category}->[0];
-                            $active{$user} = 1 if $first_bin eq $bins{$category}->[1];
+                            $active{$user} = $safe{$user} = 1
+                                if $first_bin eq $bins{$category}->[0];
+                            $active{$user} = 1
+                                if $first_bin eq $bins{$category}->[1];
                         }
                         else {
                             delete $safe{$user};
@@ -174,17 +194,29 @@ sub find_longest_chains
                 $first_bin = $bin if $length == 1;
             }
         }
-        @entries = map { { user => $_, count => $chain{$_}, safe => $safe{$_} // 0, active => $active{$_} // 0 } }
-                   grep { $chain{$_} > 2 }
-                   sort { $chain{$b} <=> $chain{$a} }
-                   keys %chain;
-        push(@lists, { title => "once a $category", entries => \@entries });
+
+        my $rank = 0;
+        my $prev = 0; # sentinel
+        @entries = map {
+                $rank++ if $chain{$_} != $prev;
+                $prev = $chain{$_};
+                {
+                    contest=> 'all-times',
+                    rank   => $rank,
+                    author => $_,
+                    count  => $chain{$_},
+                    safe   => $safe{$_} // 0,
+                    active => $active{$_} // 0
+                }
+            }
+            grep { $chain{$_} > 2 }
+            sort { $chain{$b} <=> $chain{$a} }
+            keys %chain;
+
+        my $rs = $schema->resultset("OnceA\u$category");
+        $rs->search( { contest => 'all-times' } )->delete();
+        $rs->populate( \@entries );
     }
-    $template->process('top10-page.html',
-                       { lists => \@lists, limit => 10, chapter => 'alltime', section => 'top10' },
-                       'alltime-top10.html');
-    $template->process('top10-page.html',
-                       { lists => \@lists, limit => 250, chapter => 'alltime', section => 'top250' },
-                       'alltime-top250.html');
+
 }
 
