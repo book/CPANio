@@ -7,7 +7,10 @@ use Template;
 use Path::Class;
 
 # cache the various handlers
-my %handler;
+has handler => (
+    is      => 'ro',
+    default => sub { {} },
+);
 
 # default configuration
 sub default_config {
@@ -72,7 +75,7 @@ sub dispatch_request {
         # each top-level directory is handled by a different module
         sub (/*/...) {
             my ( $self, $top, $env ) = @_;
-            my $app = $handler{$top} ||= do {
+            my $app = $self->handler->{$top} ||= do {
                 eval { require "CPANio/App/\u$top.pm" }
                     or return Plack::Response->new(404)->finalize;
                 "CPANio::App::\u$top"
