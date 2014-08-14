@@ -28,5 +28,26 @@ convert $ASSETS/cpanio-16.png \
         $ASSETS/cpanio-48.png \
         $ASSETS/favicon.ico
 
+# make a crude first logo
+FONT=Myriad-Pro-Bold
+FONTSIZE=96
+for label in CPAN io ; do
+    convert \
+        -background none -font $FONT \
+       \( -gravity center -pointsize $FONTSIZE label:$label \) \
+       $ASSETS/$label.png
+done
+
+convert \
+    -background none xc:none \
+     \( -gravity center $ASSETS/CPAN.png \) \
+     \( -gravity center $ASSETS/cpanio-48.png \) \
+     \( -gravity center $ASSETS/io.png \) \
+    +append \
+    -trim \
+    +repage \
+    $ASSETS/logo.png
+
 # move the assets we actually use to their final destination
 cp $ASSETS/favicon.ico $SITE/static/
+cp $ASSETS/logo.png    $SITE/static/img/
