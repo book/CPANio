@@ -54,7 +54,7 @@ sub dispatch_request {
         },
 
         # any .html will be wrapped in the default layout
-        sub (.html) {
+        sub (.html | / | /**/) {
             response_filter {
                 my ($res) = @_;
 
