@@ -13,10 +13,10 @@ for my $method (qw( POST PUT DELETE HEAD )) {
 
 # these request give various errors
 my @uri = (
-    [ '/zlonk/'               => 404 ],
-    [ '/../fail.t'            => 404 ],
-    [ '/../../fail.t'         => 403 ],    # security
-    [ '/blog/../goodbye.html' => 403 ],    # security
+    [ '/zlonk/'                => 404 ],
+    [ '/../fail.t'             => 404 ],
+    [ '/../../fail.t'          => 403 ],    # security
+    [ '/pulse/../goodbye.html' => 403 ],    # security
 );
 
 for my $t (@uri) {

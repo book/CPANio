@@ -73,6 +73,19 @@ sub dispatch_request {
         },
 
         # each top-level directory is handled by a different module
+        sub (/pulse/...) {
+            my ( $self, $env ) = @_;
+            my $app = $self->handler->{pulse} ||= do {
+                require CPANio::App::Blog;
+                my $pulse_dir
+                    = dir( $self->config->{base_dir} )->subdir('pulse');
+                CPANio::App::Blog->new(
+                    config => { %{ $self->config }, blog_dir => $pulse_dir, }
+                )->to_psgi_app;
+            };
+            $app->($env);
+        },
+
         sub (/*/...) {
             my ( $self, $top, $env ) = @_;
             my $app = $self->handler->{$top} ||= do {
