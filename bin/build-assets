@@ -1,0 +1,32 @@
+#!/bin/sh
+SITE=`readlink -f $(dirname $0)/../site`
+ASSETS=$SITE/assets
+
+# make sure the various directories exist
+for dir in $ASSETS $SITE/static/img ; do
+    if [ ! -e $dir ] ; then mkdir -p $dir ; fi
+done
+
+# the main icon
+convert -size 48x48 xc:none \
+        -fill '#FF66CC' \
+        -draw "translate 11,37 circle 0,0 7,7" \
+        -fill '#3366FF' \
+        -draw "translate 11,11 circle 0,0 7,7" \
+        -draw "translate 37,11 circle 0,0 7,7" \
+        -draw "translate 37,37 circle 0,0 7,7" \
+        -blur 0x1 \
+        $ASSETS/cpanio-48.png
+
+# generate the smaller sizes
+convert -resize 32x32 $ASSETS/cpanio-48.png $ASSETS/cpanio-32.png
+convert -resize 16x16 $ASSETS/cpanio-48.png $ASSETS/cpanio-16.png
+
+# merge all in a single icon
+convert $ASSETS/cpanio-16.png \
+        $ASSETS/cpanio-32.png \
+        $ASSETS/cpanio-48.png \
+        $ASSETS/favicon.ico
+
+# move the assets we actually use to their final destination
+cp $ASSETS/favicon.ico $SITE/static/
