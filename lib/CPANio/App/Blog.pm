@@ -9,8 +9,8 @@ sub dispatch_request {
     my ($self) = @_;
 
     # check the configuration
-    my $dir = dir( $self->config->{blog_dir} );
-    die "blog_dir is not defined" if ! $dir;
+    my $blog_dir = dir( $self->config->{blog_dir} );
+    die "blog_dir is not defined" if ! $blog_dir;
 
     # various index pages
     sub (/)  { ... },
@@ -20,7 +20,6 @@ sub dispatch_request {
     # a blog post to render
     sub (/**) {
         my ( $self, $post, $env ) = @_;
-        my $blog_dir = dir( $self->config->{blog_dir} );
         my $file = eval { file( $blog_dir, $post . '.md' )->resolve };
         return Plack::Response->new(404)->finalize if !$file;
         return Plack::Response->new(403)->finalize
