@@ -26,7 +26,7 @@ sub BUILD {
 
     # generate the rest of the config from the defaults
     $config->{"${_}_dir"} //= $base->subdir($_)
-        for qw( static blog templates );
+        for qw( static doc templates );
 
     $config->{template} //= Template->new(
         INCLUDE_PATH => $config->{templates_dir},
@@ -76,11 +76,11 @@ sub dispatch_request {
         sub (/pulse/...) {
             my ( $self, $env ) = @_;
             my $app = $self->handler->{pulse} ||= do {
-                require CPANio::App::Blog;
+                require CPANio::App::Document;
                 my $pulse_dir
                     = dir( $self->config->{base_dir} )->subdir('pulse');
-                CPANio::App::Blog->new(
-                    config => { %{ $self->config }, blog_dir => $pulse_dir, }
+                CPANio::App::Document->new(
+                    config => { %{ $self->config }, doc_dir => $pulse_dir, }
                 )->to_psgi_app;
             };
             $app->($env);

@@ -1,4 +1,4 @@
-package CPANio::App::Blog;
+package CPANio::App::Document;
 
 use Web::Simple;
 use Plack::Response;
@@ -9,21 +9,21 @@ sub dispatch_request {
     my ($self) = @_;
 
     # check the configuration
-    my $blog_dir = dir( $self->config->{blog_dir} );
-    die "blog_dir is not defined" if ! $blog_dir;
+    my $doc_dir = dir( $self->config->{doc_dir} );
+    die "doc_dir is not defined" if ! $doc_dir;
 
     # various index pages
     sub (/)  { ... },
 
     sub (/**/)  { ... },
 
-    # a blog post to render
+    # a doc page to render
     sub (/**) {
-        my ( $self, $post, $env ) = @_;
-        my $file = eval { file( $blog_dir, $post . '.md' )->resolve };
+        my ( $self, $page, $env ) = @_;
+        my $file = eval { file( $doc_dir, $page . '.md' )->resolve };
         return Plack::Response->new(404)->finalize if !$file;
         return Plack::Response->new(403)->finalize
-            if !$blog_dir->contains($file);
+            if !$doc_dir->contains($file);
 
         [   200,
             [ 'Content-type', 'text/html' ],
