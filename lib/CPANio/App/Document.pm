@@ -21,7 +21,7 @@ sub dispatch_request {
     sub (/**) {
         my ( $self, $page, $env ) = @_;
         my $file = eval { file( $doc_dir, $page . '.md' )->resolve };
-        return Plack::Response->new(404)->finalize if !$file;
+        return if !$file;
         return Plack::Response->new(403)->finalize
             if !$doc_dir->contains($file);
 
