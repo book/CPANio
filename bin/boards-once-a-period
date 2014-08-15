@@ -130,10 +130,11 @@ sub find_current_chains
             }
         }
 
-        my $rank = 0;
+        my $Rank = my $rank = 0;
         my $prev = 0; # sentinel
         @entries = map {
-                $rank++ if $chain{$_} != $prev;
+                $Rank++;
+                $rank = $Rank if $chain{$_} != $prev;
                 $prev = $chain{$_};
                 {   contest => 'current',
                     rank    => $rank,
@@ -196,10 +197,11 @@ sub find_longest_chains
             }
         }
 
-        my $rank = 0;
+        my $Rank = my $rank = 0;
         my $prev = 0; # sentinel
         @entries = map {
-                $rank++ if $chain{$_} != $prev;
+                $Rank++;
+                $rank = $Rank if $chain{$_} != $prev;
                 $prev = $chain{$_};
                 {
                     contest=> 'all-times',
