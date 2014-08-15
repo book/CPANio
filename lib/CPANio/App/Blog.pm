@@ -26,7 +26,7 @@ sub dispatch_request {
             if !$blog_dir->contains($file);
 
         [   200,
-            [ 'Content-type', 'text/plain' ],
+            [ 'Content-type', 'text/html' ],
             [ markdown( scalar $file->slurp ) ]
         ];
     }
