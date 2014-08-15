@@ -33,6 +33,17 @@ sub BUILD {
     );
 }
 
+# automatically load, configure and cache a sub-application handler
+sub handler_for {
+    my ( $self, $category, $extra ) = @_;
+    return $self->handler->{$category} ||= do {
+        require "CPANio/App/\u$category.pm";
+        my $config = { %{ $self->config } };
+        @{$config}{ keys %$extra } = values %$extra if $extra;
+        "CPANio::App::\u$category"->new( config => $config )->to_psgi_app;
+    };
+}
+
 # the top-level dispatcher
 sub dispatch_request {
 
@@ -72,20 +83,14 @@ sub dispatch_request {
             }
         },
 
-        # each top-level directory is handled by a different module
+        # assume the requested page is a "document"
         sub (/pulse/...) {
             my ( $self, $env ) = @_;
-            my $app = $self->handler->{pulse} ||= do {
-                require CPANio::App::Document;
-                my $pulse_dir
-                    = dir( $self->config->{base_dir} )->subdir('pulse');
-                CPANio::App::Document->new(
-                    config => { %{ $self->config }, doc_dir => $pulse_dir, }
-                )->to_psgi_app;
-            };
-            $app->($env);
+            my $pulse_dir = dir( $self->config->{base_dir} )->subdir('pulse');
+            $self->handler_for('document', { doc_dir => $pulse_dir } )->($env);
         },
 
+        # generic handlers
         sub (/*/...) {
             my ( $self, $top, $env ) = @_;
             my $app = $self->handler->{$top} ||= do {
