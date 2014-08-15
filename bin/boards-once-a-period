@@ -143,6 +143,7 @@ sub find_current_chains
                     active  => 1,
                 }
             }
+            grep { $chain{$_} >= 2 }
             sort { $chain{$b} <=> $chain{$a} }
             keys %chain;
 
@@ -209,7 +210,7 @@ sub find_longest_chains
                     active => $active{$_} // 0
                 }
             }
-            grep { $chain{$_} > 2 }
+            grep { $chain{$_} >= 2 }
             sort { $chain{$b} <=> $chain{$a} }
             keys %chain;
 
