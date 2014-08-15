@@ -3,7 +3,7 @@ package CPANio::App::Blog;
 use Web::Simple;
 use Plack::Response;
 use Path::Class;
-use Text::Markdown 'markdown';
+use Text::Markdown::PerlExtensions 'markdown';
 
 sub dispatch_request {
     my ($self) = @_;
