@@ -1,0 +1,125 @@
+body {
+    font-family: 'Varela Round', sans-serif;
+    color: #555;
+    font-size: 11pt;
+}
+
+h1 {
+    color: #af3142;
+    font-size: 32pt;
+    margin: 10px 20px;
+    white-space: nowrap;
+}
+
+h2 {
+    font-size: 18pt;
+    color: #af3142;
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+
+div.selector {
+    font-size: 18pt;
+    color: #777;
+    white-space: nowrap;
+}
+
+div.selector a {
+    color: #777;
+    margin-left: 0.5em;
+    margin-right: 0;
+}
+
+div.selector a:hover {
+    color: #333;
+}
+
+div.group {
+    display: inline-block;
+    margin: 1em;
+    white-space: nowrap;
+}
+
+div.selector .selected {
+    color: #af3142;
+}
+
+a {
+    text-decoration: none;
+}
+
+tr.user.safe {
+    background-color: #cceecc;
+}
+
+tr.user.active {
+    background-color: #ffff99;
+}
+
+tr.user.active:hover {
+    background-color: #E6E68A;
+}
+
+tr.user.safe:hover {
+    background-color: #bbddbb;
+}
+
+tr.user:hover {
+    background-color: #eaeaea;
+}
+
+tr.user td {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top: solid 1px #fff;
+}
+
+tr.user td:first-child {
+    margin-right: 0;
+    text-align: right;
+    color: #999;
+    font-size: 10pt;
+}
+
+table.chain {
+    font-size: 12pt;
+}
+
+table.chain thead th {
+    padding: 4px 6px;
+    background-color: #f0f0f0;
+}
+
+div.navbar {
+    padding: 5px;
+    white-space: nowrap;
+}
+
+div.navbar * {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 2px 4px;
+}
+
+div.navbar a {
+    color: #555;
+}
+
+div.navbar a.selected {
+    background-color: #eaeaea;
+}
+
+div.navbar a:hover {
+    color: #333;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #333;
+}
+
+div.navbar span {
+    color: #af3142;
+}
