@@ -91,10 +91,9 @@ sub dispatch_request {
         },
 
         # assume the requested page is a "document"
-        sub (/pulse/...) {
+        sub (/...) {
             my ( $self, $env ) = @_;
-            my $pulse_dir = dir( $self->config->{docs_dir} )->subdir('pulse');
-            $self->handler_for('document', { docs_dir => $pulse_dir } )->($env);
+            $self->handler_for('document')->($env);
         },
 
         # other handlers
