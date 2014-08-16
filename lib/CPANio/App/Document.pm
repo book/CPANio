@@ -13,9 +13,9 @@ sub dispatch_request {
     die "docs_dir is not defined" if ! $docs_dir;
 
     # various index pages
-    sub (/)  { ... },
+    sub (/)  { redispatch_to '/index.html' },
 
-    sub (/**/)  { ... },
+    sub (/**/)  { redispatch_to "/$_[1]/index.html" },
 
     # a document page to render
     sub (/**) {
