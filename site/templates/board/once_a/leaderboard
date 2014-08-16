@@ -3,10 +3,10 @@
   <tbody>
   [% WHILE ( entry = entries.next ) %][% LAST IF limit.defined && entry.rank > limit %]
     <tr class="user[% IF entry.safe %] safe[% ELSIF entry.active %] active[% END %]">
-      <td align=left>[% entry.rank == prev ? '' : entry.rank _ '.' %]</td>
+      <td align=left>[% entry.rank == prev ? '-&nbsp;' : entry.rank _ '.' %]</td>
       <td align=left><a href="https://metacpan.org/author/[% entry.author %]">[% entry.author %]</a></td>
       <td align=right>[% entry.count %]</td>
     </tr>
-  [% END %]
+  [% prev = entry.rank ; END %]
   </tbody>
 </table>
