@@ -6,6 +6,8 @@ use Plack::Response;
 use Template;
 use Path::Class;
 
+use CPANio::Schema;
+
 # cache the various handlers
 has handler => (
     is      => 'ro',
@@ -31,6 +33,11 @@ sub BUILD {
     $config->{template} //= Template->new(
         INCLUDE_PATH => $config->{templates_dir},
     );
+
+    $config->{schema} //= CPANio::Schema->connect(
+        "dbi:SQLite:dbname=" . $base->file("boards.sqlite"),
+        '', '', { AutoCommit => 1 } );
+
 }
 
 # automatically load, configure and cache a sub-application handler
