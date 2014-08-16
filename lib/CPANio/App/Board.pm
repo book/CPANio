@@ -4,6 +4,8 @@ use Web::Simple;
 use Plack::Response;
 use CPANio::Schema;
 
+sub _build_final_dispatcher { sub () {} }
+
 sub dispatch_request {
     my ($self) = @_;
 
