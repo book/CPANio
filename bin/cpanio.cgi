@@ -6,4 +6,5 @@ use CPANio::App;
 
 my $base = dir($FindBin::Bin)->parent->subdir('site');
 
-CPANio::App->new( config => { base_dir => $base } )->run_if_script;
+CPANio::App->new( config => { base_dir => $base, ui => 'layout' } )
+    ->run_if_script;
