@@ -9,21 +9,21 @@ sub dispatch_request {
     my ($self) = @_;
 
     # check the configuration
-    my $doc_dir = dir( $self->config->{doc_dir} );
-    die "doc_dir is not defined" if ! $doc_dir;
+    my $docs_dir = dir( $self->config->{docs_dir} );
+    die "docs_dir is not defined" if ! $docs_dir;
 
     # various index pages
     sub (/)  { ... },
 
     sub (/**/)  { ... },
 
-    # a doc page to render
+    # a document page to render
     sub (/**) {
         my ( $self, $page, $env ) = @_;
-        my $file = eval { file( $doc_dir, $page . '.md' )->resolve };
+        my $file = eval { file( $docs_dir, $page . '.md' )->resolve };
         return if !$file;
         return Plack::Response->new(403)->finalize
-            if !$doc_dir->contains($file);
+            if !$docs_dir->contains($file);
 
         [   200,
             [ 'Content-type', 'text/html' ],

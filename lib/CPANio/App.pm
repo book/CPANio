@@ -26,7 +26,7 @@ sub BUILD {
 
     # generate the rest of the config from the defaults
     $config->{"${_}_dir"} //= $base->subdir($_)
-        for qw( static doc templates );
+        for qw( static docs templates );
 
     $config->{template} //= Template->new(
         INCLUDE_PATH => $config->{templates_dir},
@@ -86,8 +86,8 @@ sub dispatch_request {
         # assume the requested page is a "document"
         sub (/pulse/...) {
             my ( $self, $env ) = @_;
-            my $pulse_dir = dir( $self->config->{base_dir} )->subdir('pulse');
-            $self->handler_for('document', { doc_dir => $pulse_dir } )->($env);
+            my $pulse_dir = dir( $self->config->{docs_dir} )->subdir('pulse');
+            $self->handler_for('document', { docs_dir => $pulse_dir } )->($env);
         },
 
         # generic handlers
