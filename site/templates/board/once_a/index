@@ -1,0 +1,13 @@
+<table width="100%" align=center>
+    <tr valign=top>
+        [% FOREACH name IN [ 'current', 'all-times' ] ; board = boards.$name %]
+            <td align=center>
+            [% PROCESS board/once_a/leaderboard
+               title   = board.title
+               entries = board.entries
+               limit   = limit
+            %]
+            </td>
+        [% END %]
+    </tr>
+</table>
