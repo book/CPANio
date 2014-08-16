@@ -97,17 +97,10 @@ sub dispatch_request {
             $self->handler_for('document', { docs_dir => $pulse_dir } )->($env);
         },
 
-        # generic handlers
-        sub (/*/...) {
-            my ( $self, $top, $env ) = @_;
-            my $app = $self->handler->{$top} ||= do {
-                eval { require "CPANio/App/\u$top.pm" }
-                    or return Plack::Response->new(404)->finalize;
-                "CPANio::App::\u$top"
-                    ->new( config => $self->config )->to_psgi_app;
-            };
-            $app->($env);
-
+        # other handlers
+        sub (/board/...) {
+            my ( $self, $env ) = @_;
+            $self->handler_for('board')->($env);
         },
 
         # not found
