@@ -6,6 +6,8 @@
 Welcome to CPAN.io!
 
 In the coming months, we'll build and grow the site.  
-For now, enjoy a new version of the “[CPAN once-a-period](/board/once-a/)” [boards](/board/).
+For now, you can enjoy
+a new version of the “[CPAN once-a-period](/board/once-a/)” [boards](/board/),
+and read a thorough [history of CPAN](/ref/history.html).
 
 — Your hosts, A<BOOK> & A<NEILB>
