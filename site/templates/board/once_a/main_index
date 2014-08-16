@@ -1,0 +1,37 @@
+<h1>CPAN regular releasers boards</h1>
+
+<p>On December 31<sup>st</sup>, 2011, <a href="https://metacpan.org/author/MARKF" class="cpanAuthor">MARKF</a> decided, in his new year's
+resolution for 2012, to release a Perl distribution to the CPAN
+<a href="http://blog.twoshortplanks.com/2011/12/31/once-a-week-every-week/">once a week, every week</a>.</p>
+
+<p>This immediately sparkled some interest, and although Mark failed to
+keep his own resolution at some point in March 2012, the game was on.
+At around the same time, <a href="https://metacpan.org/author/CJM" class="cpanAuthor">CJM</a> wrote <a href="https://metacpan.org/pod/DateTimeX::Seinfeld" class="module">DateTimeX::Seinfeld</a> and set up
+a board following Mark's rules on <a href="http://onceaweek.cjmweb.net/">http://onceaweek.cjmweb.net/</a>.</p>
+
+<p>In February 2014, <a href="https://metacpan.org/author/NEILB" class="cpanAuthor">NEILB</a> extended the game to include leaderboards
+for monthly and daily release schedules.
+Titled the <a href="http://neilb.org/cpan-regulars/">CPAN Regulars Releasers</a>,
+his version of the game has stricter rules, using the timestamp as
+recorded by PAUSE.</p>
+
+<p>CPAN.io uses the same rules as <a href="https://metacpan.org/author/NEILB" class="cpanAuthor">NEILB</a>.</p>
+
+<p>
+The tables below list the top [% limit %] participants.
+</p>
+
+<table width="100%" align=center>
+    <tr valign=top>
+        [% FOREACH name IN [ 'month', 'week', 'day' ] ; board = boards.$name %]
+            <td align=center>
+            [% PROCESS board/once_a/leaderboard
+               title   = board.title
+               entries = board.entries
+               limit   = limit
+               url     = board.url
+            %]
+            </td>
+        [% END %]
+    </tr>
+</table>

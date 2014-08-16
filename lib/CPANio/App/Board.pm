@@ -9,6 +9,34 @@ sub _build_final_dispatcher { sub () {} }
 sub dispatch_request {
     my ($self) = @_;
 
+    sub (/once-a/) {
+        my $schema = $self->config->{schema};
+        my $tt     = $self->config->{template};
+        my $vars   = {
+            boards => {
+                map {
+                    (   $_ => {
+                            entries =>
+                                scalar $schema->resultset("OnceA\u$_")
+                                ->search(
+                                { contest  => 'current' },
+                                { order_by => [ 'rank', 'author' ] }
+                                ),
+                            title => "once a $_",
+                            url   => "$_/",
+                        }
+                        )
+                    } qw( day week month )
+            },
+            limit => 10,
+        };
+
+        $tt->process( 'board/once_a/main_index', $vars, \my $output )
+            or die $tt->error();
+
+        [ 200, [ 'Content-type', 'text/html' ], [$output] ];
+    },
+
     sub (/once-a/*/) {
         my ( $self, $category, $env ) = @_;
 
@@ -34,11 +62,11 @@ sub dispatch_request {
             limit => 200,
             period => $category,
         };
-        $tt->process( 'board/once_a/index', $vars, \my $output )
+        $tt->process( 'board/once_a/category_index', $vars, \my $output )
             or die $tt->error();
 
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
-        },
+    },
 
 }
 
