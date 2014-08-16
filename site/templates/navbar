@@ -1,5 +1,6 @@
 <div class="navbar">
     <a href="/">Home</a>
+    <a href="/pulse/">Pulse</a>
     <a href="/board/">Boards</a>
     <a href="/ref/">Reference</a>
 </div>
