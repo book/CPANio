@@ -33,19 +33,6 @@ edited for brevity and readability):
     23:27 <BooK> PlayPAN ?
     23:28 <neilb> I quite like the PlayPAN name, but my one reservation is that it doesn't have the 'CPAN' name in it. Would hopefully be a .perl.org name, which makes the perl link clear, I guess.
     23:29 <BooK> play.cpan.org or dash.cpan.org would be awesome to have
-    23:29 <BooK> not sure there's someone in Lyon we can beeribe
-    23:29 <BooK> (did that pun make any sense?)
-    23:31 <neilb> dashboard.cpan.org would be good, but I asked about getting a .cpan.org name once before, and was told that .cpan.org is a funny beast, because of mirror sites, so generally people can't get *.cpan.org
-    23:32 <neilb> cpan.dashboard.perl.org and play.dashboard.perl.org? Nah, too much of a mouthful
-    23:32 <neilb> yes, the pun made sense, btw
-    23:32 <BooK> ooh
-    23:32 <BooK> it's probably even a neologism
-    23:32 <BooK> and a portemanteaux
-    23:33 <neilb> don't get carried away!
-    23:33 <BooK> it's almost a word!
-    23:33 <BooK> I'll lobby the dictionaries!!
-    23:34 <neilb> I think you might have a neologism there. Write a blog post where you use it and define it.
-    23:34 <neilb> We start referring to it and linking to it.
     23:42 <BooK> it's annoying that "play perl" was taken already
     23:42 <BooK> questhub is a very good name
     23:42 <BooK> did you know that cpan.io is free?
