@@ -5,6 +5,7 @@
   <link rel=stylesheet type="text/css" href="/css/cpanio.css">
 </head>
 <body>
+[% INCLUDE navbar %]
 [% content %]
 </body>
 </html>
