@@ -22,14 +22,15 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$category")
                                 ->search(
                                 { contest  => $_ },
-                                { order_by => 'rank' }
+                                { order_by => [ 'rank', 'author' ] }
                                 ),
                             title => $_
                         }
                         )
                     } qw( current all-times )
             },
-            limit => 250,
+            limit => 200,
+            period => $category,
         };
         $tt->process( 'board/once_a/index', $vars, \my $output )
             or die $tt->error();
