@@ -1,15 +1,21 @@
 #!/usr/bin/env perl
+use 5.010;
 use strict;
 use warnings;
 use CPAN::ReleaseHistory;
 use DateTime;
 use Template;
-use 5.010;
 use FindBin;
 use Path::Class;
-use CPANio::Schema;
 
-my $base   = dir($FindBin::Bin)->parent->subdir('site');
+my $base;
+
+BEGIN {
+    $base = dir($FindBin::Bin)->parent->subdir('site');
+    unshift @INC, $base->parent->subdir('lib')->stringify;
+}
+
+use CPANio::Schema;
 my $schema
     = CPANio::Schema->connect(
     "dbi:SQLite:dbname=" . $base->file("boards.sqlite"),
