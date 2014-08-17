@@ -11,6 +11,7 @@ if [ -z $DST ] ; then DST=cpan.io ; fi
 if [ ! -e $DST ] ; then mkdir -p $DST ; fi
 
 # generate the static pages
+eval `perl -Mlocal::lib`
 wallflower \
     --include $SRC/lib \
     --destination $DST \
