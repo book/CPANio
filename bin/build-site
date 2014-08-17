@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# our directories
+SRC=`readlink -f $(dirname $0)/..`
+DST=$1
+
+# default
+if [ -z $DST ] ; then DST=cpan.io ; fi
+
+# make sure the local target directory exists
+if [ ! -e $DST ] ; then mkdir -p $DST ; fi
+
+# generate the static pages
+wallflower \
+    --include $SRC/lib \
+    --destination $DST \
+    --application $SRC/bin/cpanio.cgi

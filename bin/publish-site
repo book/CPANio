@@ -19,14 +19,8 @@ while : ; do
     esac
 done
 
-# make sure the local target directory exists
-if [ ! -e $DST ] ; then mkdir -p $DST ; fi
-
 # generate the static pages
-wallflower \
-    --include $SRC/lib \
-    --destination $DST \
-    --application $SRC/bin/cpanio.cgi
+$SRC/bin/build-site $DST
 
 # copy them to the server
 rsync -avz --delete $DST cpan.io:www/
