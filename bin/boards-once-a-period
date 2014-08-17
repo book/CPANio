@@ -94,7 +94,8 @@ sub final_week_number
 
 sub process_cpan_releases
 {
-    my $iterator = CPAN::ReleaseHistory->new()->release_iterator(well_formed => 1);
+    my $iterator = CPAN::ReleaseHistory->new( max_age => '1 hour' )
+        ->release_iterator( well_formed => 1 );
 
     while (my $release = $iterator->next_release) {
         my $user               = $release->distinfo->cpanid;
