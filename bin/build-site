@@ -13,6 +13,7 @@ if [ ! -e $DST ] ; then mkdir -p $DST ; fi
 # generate the static pages
 eval `perl -Mlocal::lib`
 wallflower \
+    --quiet \
     --include $SRC/lib \
     --destination $DST \
     --application $SRC/bin/cpanio.cgi
