@@ -148,7 +148,7 @@ sub find_current_chains
                     author  => $_,
                     count   => $chain{$_},
                     safe    => $safe{$_} // 0,
-                    active  => 1,
+                    active  => 0,
                 }
             }
             grep { $chain{$_} >= 2 }
