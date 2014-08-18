@@ -6,7 +6,7 @@ use Plack::Response;
 use Template;
 use Path::Class;
 
-use CPANio::Schema;
+use CPANio;
 
 # cache the various handlers
 has handler => (
@@ -34,9 +34,7 @@ sub BUILD {
         INCLUDE_PATH => $config->{templates_dir},
     );
 
-    $config->{schema} //= CPANio::Schema->connect(
-        "dbi:SQLite:dbname=" . $base->file("boards.sqlite"),
-        '', '', { AutoCommit => 1 } );
+    $config->{schema} //= $CPANio::schema;
 
 }
 
