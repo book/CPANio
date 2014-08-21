@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use 5.010;
+use strict;
+use warnings;
+use local::lib;
+use FindBin;
+use Path::Class;
+
+my $base;
+
+BEGIN {
+    $base = dir($FindBin::Bin)->parent->subdir('site');
+    unshift @INC, $base->parent->subdir('lib')->stringify;
+}
+
+use CPANio;
+
+my @boards = qw( Bins );
+
+for my $board ( @boards ) {
+    require "CPANio/Board/$board.pm";
+    "CPANio::Board::$board"->update;
+}
