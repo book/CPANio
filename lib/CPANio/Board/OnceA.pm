@@ -56,7 +56,7 @@ sub _datetime_to_bins {
         ;
 }
 
-sub _build_bins {
+sub _update_empty_bins {
     my ($since) = @_;
 
     # start at the beginning of the given day
@@ -69,13 +69,19 @@ sub _build_bins {
     # create all bins until NOW
     my $now = time;
     my %bins;
-    while( $dt->epoch < $now ) {
+    while ( $dt->epoch < $now ) {
         $bins{$_} = 0 for _datetime_to_bins($dt);
         $dt->add( days => 1 );
     }
 
-    $CPANio::schema->resultset('OnceABins')
-        ->populate( [ map +{ bin => $_ }, keys %bins ] );
+    my $bins_rs = $CPANio::schema->resultset('OnceABins');
+    if ( $bins_rs->search( { author => '' } )->count ) {    # update
+        $bins_rs->update_or_create( { bin => $_, author => '' } )
+            for keys %bins;
+    }
+    else {                                                  # create
+        $bins_rs->populate( [ map +{ bin => $_ }, keys %bins ] );
+    }
 }
 
 # CLASS METHODS
