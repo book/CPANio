@@ -6,11 +6,10 @@ __PACKAGE__->table('once_a_bins');
 
 __PACKAGE__->add_columns(
     bin    => { data_type => 'text',    is_nullable => 0 },
-    author => { data_type => 'text',    is_nullable => 0 },
-    count  => { data_type => 'integer', is_nullable => 0 },
+    author => { data_type => 'text',    is_nullable => 0, default => '' },
+    count  => { data_type => 'integer', is_nullable => 0, default => 0 },
 );
 
-__PACKAGE__->add_unique_constraint(
-    'once_a_bins_bin_author' => [ 'bin', 'author' ] );
+__PACKAGE__->set_primary_key( 'bin', 'author' );
 
 1;
