@@ -141,4 +141,11 @@ sub _update_author_bins {
 # CLASS METHODS
 sub board_name { 'bins' }
 
+sub update {
+    my $since = __PACKAGE__->latest_update;
+    _update_empty_bins($since);
+    my $latest_release = _update_author_bins($since);
+    __PACKAGE__->update_done($latest_release);
+}
+
 1;
