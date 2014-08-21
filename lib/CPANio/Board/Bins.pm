@@ -1,4 +1,4 @@
-package CPANio::Board::OnceA;
+package CPANio::Board::Bins;
 
 use 5.010;
 use strict;
@@ -137,7 +137,8 @@ sub _update_author_bins {
     return $latest_release;
 }
 
+
 # CLASS METHODS
-sub board_name { 'once-a' }
+sub board_name { 'bins' }
 
 1;
