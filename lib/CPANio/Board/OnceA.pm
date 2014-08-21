@@ -4,6 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use DateTime;
+use BackPAN::Index;
 
 use CPANio;
 use CPANio::Board;
@@ -82,6 +83,59 @@ sub _update_empty_bins {
     else {                                                  # create
         $bins_rs->populate( [ map +{ bin => $_ }, keys %bins ] );
     }
+}
+
+sub _update_author_bins {
+    my ($since) = @_;
+
+    my $backpan = BackPAN::Index->new(
+        update    => 1,
+        cache_ttl => 3600,    # 1 hour
+        backpan_index_url =>
+            "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
+    );
+
+    my $latest_release = $since || $FIRST_RELEASE_TIME - 1;
+    my $releases
+        = BackPAN::Index->new->releases->search(
+        { date     => { '>', $latest_release } },
+        { order_by => 'date' } );
+
+    my %bins;
+    while ( my $release = $releases->next ) {
+        my $author = $release->cpanid;
+        $latest_release = $release->date;
+        my $dt = DateTime->from_epoch( epoch => $latest_release );
+        $bins{$_}{$author}++ for _datetime_to_bins($dt);
+    }
+
+    my $bins_rs = $CPANio::schema->resultset('OnceABins');
+    if ( $bins_rs->search( { author => { '!=' => '' } } )->count ) {  # update
+        for my $bin ( keys %bins ) {
+            for my $author ( keys %{ $bins{$bin} } ) {
+                my $row = $bins_rs->find_or_create(
+                    { author => $author, bin => $bin } );
+                $row->count( ( $row->count || 0 ) + $bins{$bin}{$author} );
+                $row->update;
+            }
+        }
+    }
+    else {                                                            # create
+        $bins_rs->populate(
+            [   map {
+                    my $bin = $_;
+                    map +{
+                        bin    => $bin,
+                        author => $_,
+                        count  => $bins{$bin}{$_}
+                        },
+                        keys %{ $bins{$bin} }
+                    } keys %bins
+            ]
+        );
+    }
+
+    return $latest_release;
 }
 
 # CLASS METHODS
