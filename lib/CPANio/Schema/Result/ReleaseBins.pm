@@ -1,8 +1,8 @@
-package CPANio::Schema::Result::OnceABins;
+package CPANio::Schema::Result::ReleaseBins;
 
 use base qw/DBIx::Class::Core/;
 
-__PACKAGE__->table('once_a_bins');
+__PACKAGE__->table('release_bins');
 
 __PACKAGE__->add_columns(
     bin    => { data_type => 'text',    is_nullable => 0 },

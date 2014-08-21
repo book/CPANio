@@ -75,7 +75,7 @@ sub _update_empty_bins {
         $dt->add( days => 1 );
     }
 
-    my $bins_rs = $CPANio::schema->resultset('OnceABins');
+    my $bins_rs = $CPANio::schema->resultset('ReleaseBins');
     if ( $bins_rs->search( { author => '' } )->count ) {    # update
         $bins_rs->update_or_create( { bin => $_, author => '' } )
             for keys %bins;
@@ -109,7 +109,7 @@ sub _update_author_bins {
         $bins{$_}{$author}++ for _datetime_to_bins($dt);
     }
 
-    my $bins_rs = $CPANio::schema->resultset('OnceABins');
+    my $bins_rs = $CPANio::schema->resultset('ReleaseBins');
     if ( $bins_rs->search( { author => { '!=' => '' } } )->count ) {  # update
         for my $bin ( keys %bins ) {
             for my $author ( keys %{ $bins{$bin} } ) {
