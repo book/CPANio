@@ -6,6 +6,8 @@ use warnings;
 use DateTime;
 
 use CPANio;
+use CPANio::Board;
+our @ISA = qw( CPANio::Board );
 
 # CONSTANTS
 
@@ -75,5 +77,8 @@ sub _build_bins {
     $CPANio::schema->resultset('OnceABins')
         ->populate( [ map +{ bin => $_ }, keys %bins ] );
 }
+
+# CLASS METHODS
+sub board_name { 'once-a' }
 
 1;
