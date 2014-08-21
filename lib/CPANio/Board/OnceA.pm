@@ -89,7 +89,6 @@ sub _update_author_bins {
     my ($since) = @_;
 
     my $backpan = BackPAN::Index->new(
-        update    => 1,
         cache_ttl => 3600,    # 1 hour
         backpan_index_url =>
             "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
