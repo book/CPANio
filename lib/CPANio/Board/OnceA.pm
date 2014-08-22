@@ -117,6 +117,52 @@ sub _compute_boards_current {
     }
 }
 
+sub _compute_boards_alltime {
+    my ($chains) = @_;
+
+    for my $category (@CATEGORIES) {
+
+        # pick the bins for the current category
+        my $bins = _get_bins_for($category);
+
+        my @entries = map {
+            my $author = $_;
+            my $chains = $chains->{$category}{$author};
+            my $chain  = shift @$chains;                  # possibly active
+            {   contest => 'all-time',
+                author  => $author,
+                count   => scalar @$chain,
+                safe    => 0 + ( $chain->[0] eq $bins->[0] ),
+                active  => 0 + ( $chain->[0] eq $bins->[0] ),
+            },
+                map +{
+                contest => 'all-time',
+                author  => $author,
+                count   => scalar @$_,
+                safe    => 0,
+                active  => 0,
+                }, @$chains;
+        } keys %{ $chains->{$category} };
+
+        # sort chains
+        @entries = sort { $b->{count} <=> $a->{count} } @entries;
+
+        # compute rank
+        my $Rank = my $rank = my $prev = 0;
+        for my $entry (@entries) {
+            $Rank++;
+            $rank          = $Rank if $entry->{count} != $prev;
+            $prev          = $entry->{count};
+            $entry->{rank} = $rank;
+        }
+
+        # update database
+        my $rs = $CPANio::schema->resultset("OnceA\u$category");
+        $rs->search( { contest => 'all-time' } )->delete();
+        $rs->populate( \@entries );
+    }
+}
+
 # CLASS METHODS
 sub board_name { 'once-a' }
 
@@ -130,6 +176,7 @@ sub update {
     # pick up all the chains
     my $chains = _find_authors_chains();
     _compute_boards_current($chains);
+    _compute_boards_alltime($chains);
 
     __PACKAGE__->update_done();
 }
