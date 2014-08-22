@@ -10,6 +10,11 @@ our @ISA = qw( CPANio::Board );
 
 # CONSTANTS
 my @CATEGORIES = qw( month week day );
+my %LIKE = (
+    month => 'M%',
+    week  => 'W%',
+    day   => 'D%',
+);
 
 # PRIVATE FUNCTIONS
 sub _find_current_chains {
@@ -19,7 +24,7 @@ sub _find_current_chains {
     for my $category (@CATEGORIES) {
 
         # pick the active bins for the current contest
-        my $bins = uc( substr $category, 0, 1 ) . '%';
+        my $bins = $LIKE{$category};
         my @bins = $bins_rs->search(
             {   author => '',
                 bin    => { like => $bins },
