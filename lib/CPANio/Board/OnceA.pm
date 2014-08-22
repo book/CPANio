@@ -150,6 +150,11 @@ sub _compute_boards_alltime {
                 }, @$chains;
         } keys %{ $chains->{$category} };
 
+        # sort chains, and keep only one per author
+        my %seen;
+        @entries = grep !$seen{ $_->{author} }++,
+            sort { $b->{count} <=> $a->{count} } @entries;
+
         _commit_entries( $category, 'all-time', \@entries );
     }
 }
