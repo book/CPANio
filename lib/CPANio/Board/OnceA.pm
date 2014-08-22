@@ -17,6 +17,20 @@ my %LIKE = (
 );
 
 # PRIVATE FUNCTIONS
+sub _get_bins_for {
+    my ($category) = @_;
+    state %bins;
+
+    return $bins{$category} ||= [
+        $CPANio::schema->resultset('ReleaseBins')->search(
+            {   author => '',
+                bin    => { like => $LIKE{$category} },
+            },
+            { order_by => { -desc => 'bin' } }
+        )->get_column('bin')->all
+    ];
+}
+
 sub _find_current_chains {
     my $schema  = $CPANio::schema;
     my $bins_rs = $schema->resultset('ReleaseBins');
