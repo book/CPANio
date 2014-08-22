@@ -32,22 +32,14 @@ sub _get_bins_for {
 }
 
 sub _find_current_chains {
-    my $schema  = $CPANio::schema;
-    my $bins_rs = $schema->resultset('ReleaseBins');
 
     for my $category (@CATEGORIES) {
 
-        # pick the active bins for the current contest
-        my $bins = $LIKE{$category};
-        my @bins = $bins_rs->search(
-            {   author => '',
-                bin    => { like => $bins },
-            },
-            { order_by => { -desc => 'bin' } }
-        )->get_column('bin')->all;
+        # pick the bins for the current category
+        my @bins = @{ _get_bins_for($category) };
 
         # only pick the users having at least a relase in the latest bins
-        my @authors = $schema->resultset('ReleaseBins')->search(
+        my @authors = $CPANio::schema->resultset('ReleaseBins')->search(
             { author => { '!=' => '' }, bin => [ @bins[ 0, 1 ] ] },
             { group_by => 'author', order_by => { -asc => 'author' } }
         )->get_column('author')->all;
@@ -55,9 +47,12 @@ sub _find_current_chains {
         # get the list of bins for all the selected authors
         my %bins;
         push @{ $bins{ $_->author } }, $_->bin
-            for $bins_rs->search(
-            { author   => { -in   => \@authors }, bin => { like => $bins } },
-            { order_by => { -desc => 'bin' } } );
+            for $CPANio::schema->resultset('ReleaseBins')->search(
+            {   author => { -in  => \@authors },
+                bin    => { like => $LIKE{$category} }
+            },
+            { order_by => { -desc => 'bin' } }
+            );
 
         # compute each author's current chain
         my @entries;
@@ -91,7 +86,7 @@ sub _find_current_chains {
         }
 
         # update database
-        my $rs = $schema->resultset("OnceA\u$category");
+        my $rs = $CPANio::schema->resultset("OnceA\u$category");
         $rs->search( { contest => 'current' } )->delete();
         $rs->populate( \@entries );
     }
@@ -101,21 +96,20 @@ sub _find_authors_chains {
     my $schema  = $CPANio::schema;
     my $bins_rs = $schema->resultset('ReleaseBins');
 
+    my %chains;
+
     for my $category (@CATEGORIES) {
 
-        # pick the active bins for the current contest
-        my $bins = $LIKE{$category};
-        my @bins = $bins_rs->search(
-            { author => '', bin => { like => $bins }, },
-            { order_by => { -desc => 'bin' } }
-        )->get_column('bin')->all;
+        # pick the bins for the current category
+        my @bins = @{ _get_bins_for($category) };
 
         # get the list of bins for all the authors
         my %bins;
         push @{ $bins{ $_->author } }, $_->bin
             for $bins_rs->search(
-            { author   => { '!='  => '' }, bin => { like => $bins } },
-            { order_by => { -desc => 'bin' } } );
+            { author => { '!=' => '' }, bin => { like => $LIKE{$category} } },
+            { order_by => { -desc => 'bin' } }
+            );
 
         # process each author's bins
         for my $author ( keys %bins ) {
