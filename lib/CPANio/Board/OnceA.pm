@@ -83,6 +83,51 @@ sub _find_current_chains {
     }
 }
 
+sub _find_authors_chains {
+    my $schema  = $CPANio::schema;
+    my $bins_rs = $schema->resultset('ReleaseBins');
+
+    for my $category (@CATEGORIES) {
+
+        # pick the active bins for the current contest
+        my $bins = $LIKE{$category};
+        my @bins = $bins_rs->search(
+            { author => '', bin => { like => $bins }, },
+            { order_by => { -desc => 'bin' } }
+        )->get_column('bin')->all;
+
+        # get the list of bins for all the authors
+        my %bins;
+        push @{ $bins{ $_->author } }, $_->bin
+            for $bins_rs->search(
+            { author   => { '!='  => '' }, bin => { like => $bins } },
+            { order_by => { -desc => 'bin' } } );
+
+        # process each author's bins
+        for my $author ( keys %bins ) {
+            my $Bins = $bins{$author};
+            my @chains;
+            my $i = 0;
+
+            # split the bins into chains
+            while (@$Bins) {
+                $i++ while $Bins->[0] ne $bins[$i];
+                my $j = 0;
+                while ( $Bins->[$j] eq $bins[$i] ) {
+                    $i++;
+                    $j++;
+                    last if $j >= @$Bins;
+                }
+                my $chain = [ splice @$Bins, 0, $j ];
+                push @chains, $chain if @$chain >= 2;
+            }
+            $bins{$author} = \@chains;
+        }
+    }
+
+    return \%bins;
+}
+
 # CLASS METHODS
 sub board_name { 'once-a' }
 
