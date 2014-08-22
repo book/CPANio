@@ -75,6 +75,27 @@ sub _find_authors_chains {
     return \%chains;
 }
 
+sub _commit_entries {
+    my ( $category, $contest, $entries ) = @_;
+
+    # sort chains
+    @$entries = sort { $b->{count} <=> $a->{count} } @$entries;
+
+    # compute rank
+    my $Rank = my $rank = my $prev = 0;
+    for my $entry (@$entries) {
+        $Rank++;
+        $rank          = $Rank if $entry->{count} != $prev;
+        $prev          = $entry->{count};
+        $entry->{rank} = $rank;
+    }
+
+    # update database
+    my $rs = $CPANio::schema->resultset("OnceA\u$category");
+    $rs->search( { contest => $contest } )->delete();
+    $rs->populate($entries);
+}
+
 sub _compute_boards_current {
     my ($chains) = @_;
 
@@ -98,22 +119,7 @@ sub _compute_boards_current {
             }
         }
 
-        # sort chains
-        @entries = sort { $b->{count} <=> $a->{count} } @entries;
-
-        # compute rank
-        my $Rank = my $rank = my $prev = 0;
-        for my $entry (@entries) {
-            $Rank++;
-            $rank          = $Rank if $entry->{count} != $prev;
-            $prev          = $entry->{count};
-            $entry->{rank} = $rank;
-        }
-
-        # update database
-        my $rs = $CPANio::schema->resultset("OnceA\u$category");
-        $rs->search( { contest => 'current' } )->delete();
-        $rs->populate( \@entries );
+        _commit_entries( $category, 'current', \@entries );
     }
 }
 
@@ -144,22 +150,7 @@ sub _compute_boards_alltime {
                 }, @$chains;
         } keys %{ $chains->{$category} };
 
-        # sort chains
-        @entries = sort { $b->{count} <=> $a->{count} } @entries;
-
-        # compute rank
-        my $Rank = my $rank = my $prev = 0;
-        for my $entry (@entries) {
-            $Rank++;
-            $rank          = $Rank if $entry->{count} != $prev;
-            $prev          = $entry->{count};
-            $entry->{rank} = $rank;
-        }
-
-        # update database
-        my $rs = $CPANio::schema->resultset("OnceA\u$category");
-        $rs->search( { contest => 'all-time' } )->delete();
-        $rs->populate( \@entries );
+        _commit_entries( $category, 'all-time', \@entries );
     }
 }
 
