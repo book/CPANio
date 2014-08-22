@@ -97,7 +97,6 @@ sub _find_authors_chains {
     my $bins_rs = $schema->resultset('ReleaseBins');
 
     my %chains;
-
     for my $category (@CATEGORIES) {
 
         # pick the bins for the current category
@@ -113,7 +112,7 @@ sub _find_authors_chains {
 
         # process each author's bins
         for my $author ( keys %bins ) {
-            my $Bins = $bins{$author};
+            my $Bins = delete $bins{$author};
             my @chains;
             my $i = 0;
 
@@ -129,11 +128,12 @@ sub _find_authors_chains {
                 my $chain = [ splice @$Bins, 0, $j ];
                 push @chains, $chain if @$chain >= 2;
             }
-            $bins{$author} = \@chains;
+            $bins{$author} = \@chains if @chains;
         }
+        $chains{$category} = \%bins;
     }
 
-    return \%bins;
+    return \%chains;
 }
 
 # CLASS METHODS
