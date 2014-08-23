@@ -78,9 +78,6 @@ sub _find_authors_chains {
 sub _commit_entries {
     my ( $category, $contest, $entries ) = @_;
 
-    # sort chains
-    @$entries = sort { $b->{count} <=> $a->{count} } @$entries;
-
     # compute rank
     my $Rank = my $rank = my $prev = 0;
     for my $entry (@$entries) {
@@ -118,6 +115,9 @@ sub _compute_boards_current {
                     };
             }
         }
+
+        # sort chains
+        @entries = sort { $b->{count} <=> $a->{count} } @entries;
 
         _commit_entries( $category, 'current', \@entries );
     }
