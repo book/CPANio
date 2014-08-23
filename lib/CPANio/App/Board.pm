@@ -57,7 +57,7 @@ sub dispatch_request {
                             title => $_
                         }
                         )
-                    } qw( current all-times )
+                    } qw( current all-time )
             },
             limit => 200,
             period => $category,
