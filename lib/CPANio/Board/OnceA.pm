@@ -81,7 +81,7 @@ sub _commit_entries {
     # compute rank
     my $Rank = my $rank = my $prev = 0;
     for my $entry (@$entries) {
-        $Rank++;
+        $Rank++ unless $entry->{fallen} && $contest eq 'current';
         $rank          = $Rank if $entry->{count} != $prev;
         $prev          = $entry->{count};
         $entry->{rank} = $rank;
@@ -103,14 +103,17 @@ sub _compute_boards_current {
     my @entries;
     for my $author ( keys %{ $chains->{$category} } ) {
         my $chain = $chains->{$category}{$author}[0];    # current chain only
-        if ( $chain->[0] eq $bins->[0] || $chain->[0] eq $bins->[1] ) {
+        if (   $chain->[0] eq $bins->[0]
+            || $chain->[0] eq $bins->[1]
+            || $chain->[0] eq $bins->[2] )
+        {
             push @entries, {
                 contest => 'current',
                 author  => $author,
                 count   => scalar @$chain,
                 safe    => 0 + ( $chain->[0] eq $bins->[0] ),
                 active  => 0,
-                fallen  => 0,
+                fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
                 };
         }
     }
