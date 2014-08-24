@@ -8,7 +8,24 @@ goes into CPAN (which you can see on BackPAN). This is very close to the
 when you upload something.
 </p>
 <p>
-The tables below list the top [% limit %] participants.
+[% SWITCH period -%]
+[% CASE 'month' -%]
+In the monthly contest, months start on 00:00:00 UTC the first day of
+the month, and end at midnight UTC on the last day of the month.
+[% CASE 'week' -%]
+In the weekly contest, weeks are counted from Sunday 00:00:00 UTC
+until the next Saturday at midnight UTC. In the context of the contest,
+the first week of the yearly contest is the first <b>full</b> week
+of the year. For example, the first week of the 2014 contest started
+on Sunday, January 5, 2014. In <code>strftime(2)</code> terms, this is
+week 1 according to <code>%U</code>, with week 0 being part of the previous
+year.
+[% CASE 'day' -%]
+In the daily contest, days start on 00:00:00 UTC and end at midnight UTC.
+[% END -%]
+</p>
+<p>
+The tables below list the top participants up to rank [% limit %].
 </p>
 
 <table width="100%" align=center>
