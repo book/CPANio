@@ -153,7 +153,47 @@ sub _compute_boards_alltime {
     _commit_entries( $category, 'all-time', \@entries );
 }
 
+sub _compute_boards_yearly {
+    my ( $chains, $category ) = @_;
+    my @years = ( 1995 .. 1900 + (gmtime)[5] );
 
+    # pick the bins for the current category
+    my $bins = _get_bins_for($category);
+
+    for my $year (@years) {
+        my @entries = map {
+            my $author = $_;   # keep the sub-chains that occured during $year
+            my @chains = grep @$_, map [ grep /^\w$year\b/, @$_ ],
+                @{ $chains->{$category}{$author} };
+            @chains
+                ? do {
+                my $chain = shift @chains;    # possibly active
+                {   contest => $year,
+                    author  => $author,
+                    count   => scalar @$chain,
+                    safe    => 0 + ( $chain->[0] eq $bins->[0] ),
+                    active  => 0 + ( $chain->[0] eq $bins->[0] ),
+                },
+                    map +{
+                    contest => $year,
+                    author  => $author,
+                    count   => scalar @$_,
+                    safe    => 0,
+                    active  => 0,
+                    },
+                    @chains;
+                }
+                : ();
+        } keys %{ $chains->{$category} };
+
+        # sort chains, and keep only one per author
+        my %seen;
+        @entries = grep !$seen{ $_->{author} }++,
+            sort { $b->{count} <=> $a->{count} } @entries;
+
+        _commit_entries( $category, $year, \@entries );
+    }
+}
 
 # CLASS METHODS
 sub board_name { 'once-a' }
@@ -167,9 +207,12 @@ sub update {
 
     # pick up all the chains
     my $chains = _find_authors_chains();
+
+    # compute all contests
     for my $category (@CATEGORIES) {
         _compute_boards_current( $chains, $category );
         _compute_boards_alltime( $chains, $category );
+        _compute_boards_yearly( $chains, $category );
     }
 
     __PACKAGE__->update_done();
