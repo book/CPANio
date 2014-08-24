@@ -40,7 +40,7 @@ sub dispatch_request {
     sub (/once-a/*/) {
         my ( $self, $category, $env ) = @_;
 
-        return if $category !~ /^(day|week|month)/;
+        return if $category !~ /^(?:day|week|month)/;
 
         my $year = 1900 + (gmtime)[5];
         my @contests = ( 'current', $year, 'all-time' );
