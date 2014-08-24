@@ -110,6 +110,7 @@ sub _compute_boards_current {
                 count   => scalar @$chain,
                 safe    => 0 + ( $chain->[0] eq $bins->[0] ),
                 active  => 0,
+                fallen  => 0,
                 };
         }
     }
@@ -135,6 +136,7 @@ sub _compute_boards_alltime {
             count   => scalar @$chain,
             safe    => 0 + ( $chain->[0] eq $bins->[0] ),
             active  => 0 + ( $chain->[0] eq $bins->[1] ),
+            fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
         },
             map +{
             contest => 'all-time',
@@ -142,6 +144,7 @@ sub _compute_boards_alltime {
             count   => scalar @$_,
             safe    => 0,
             active  => 0,
+            fallen  => 0,
             }, @chains;
     } keys %{ $chains->{$category} };
 
@@ -173,6 +176,7 @@ sub _compute_boards_yearly {
                     count   => scalar @$chain,
                     safe    => 0 + ( $chain->[0] eq $bins->[0] ),
                     active  => 0 + ( $chain->[0] eq $bins->[1] ),
+                    fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
                 },
                     map +{
                     contest => $year,
@@ -180,6 +184,7 @@ sub _compute_boards_yearly {
                     count   => scalar @$_,
                     safe    => 0,
                     active  => 0,
+                    fallen  => 0,
                     },
                     @chains;
                 }

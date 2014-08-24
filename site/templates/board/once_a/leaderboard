@@ -2,7 +2,7 @@
   <thead><tr><th colspan=3>[% url ? "<a href=\"$url\">$title</a>" : "$title" %]</th></tr></thead>
   <tbody>
   [% WHILE ( entry = entries.next ) %][% LAST IF limit.defined && entry.rank > limit %]
-    <tr class="author[% IF entry.safe %] safe[% ELSIF entry.active %] active[% END %]">
+    <tr class="author[% IF entry.safe %] safe[% ELSIF entry.active %] active[% ELSIF entry.fallen %] fallen[% END %]">
       <td align=left>[% entry.rank == prev ? '-&nbsp;' : entry.rank _ '.' %]</td>
       <td align=left><a href="https://metacpan.org/author/[% entry.author %]">[% entry.author %]</a></td>
       <td align=right>[% entry.count %]</td>

@@ -59,12 +59,20 @@ tr.author.active {
     background-color: #ffff99;
 }
 
+tr.author.fallen {
+    background-color: #ff9999;
+}
+
 tr.author.active:hover {
     background-color: #E6E68A;
 }
 
 tr.author.safe:hover {
     background-color: #bbddbb;
+}
+
+tr.author.fallen:hover {
+    background-color: #e68a8a;
 }
 
 tr.author:hover {
