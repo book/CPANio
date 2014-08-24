@@ -128,8 +128,8 @@ sub _compute_boards_alltime {
 
     my @entries = map {
         my $author = $_;
-        my $chains = $chains->{$category}{$author};
-        my $chain  = shift @$chains;                  # possibly active
+        my @chains = @{ $chains->{$category}{$author} };
+        my $chain  = shift @chains;                  # possibly active
         {   contest => 'all-time',
             author  => $author,
             count   => scalar @$chain,
@@ -142,7 +142,7 @@ sub _compute_boards_alltime {
             count   => scalar @$_,
             safe    => 0,
             active  => 0,
-            }, @$chains;
+            }, @chains;
     } keys %{ $chains->{$category} };
 
     # sort chains, and keep only one per author
