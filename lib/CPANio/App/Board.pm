@@ -42,9 +42,11 @@ sub dispatch_request {
 
         return if $category !~ /^(day|week|month)/;
 
-        my $schema = $self->config->{schema};
-        my $tt     = $self->config->{template};
-        my $vars   = {
+        my $year = 1900 + (gmtime)[5];
+        my @contests = ( 'current', $year, 'all-time' );
+        my $schema   = $self->config->{schema};
+        my $tt       = $self->config->{template};
+        my $vars     = {
             boards => {
                 map {
                     (   $_ => {
@@ -57,10 +59,11 @@ sub dispatch_request {
                             title => $_
                         }
                         )
-                    } qw( current all-time )
+                    } @contests
             },
-            limit => 200,
-            period => $category,
+            limit    => 200,
+            period   => $category,
+            contests => \@contests,
         };
         $tt->process( 'board/once_a/category_index', $vars, \my $output )
             or die $tt->error();

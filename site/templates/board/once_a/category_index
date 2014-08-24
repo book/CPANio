@@ -13,7 +13,7 @@ The tables below list the top [% limit %] participants.
 
 <table width="100%" align=center>
     <tr valign=top>
-        [% FOREACH name IN [ 'current', 'all-time' ] ; board = boards.$name %]
+        [% FOREACH name IN contests ; board = boards.$name %]
             <td align=center>
             [% PROCESS board/once_a/leaderboard
                title   = board.title
