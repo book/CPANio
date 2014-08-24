@@ -134,7 +134,7 @@ sub _compute_boards_alltime {
             author  => $author,
             count   => scalar @$chain,
             safe    => 0 + ( $chain->[0] eq $bins->[0] ),
-            active  => 0 + ( $chain->[0] eq $bins->[0] ),
+            active  => 0 + ( $chain->[0] eq $bins->[1] ),
         },
             map +{
             contest => 'all-time',
@@ -172,7 +172,7 @@ sub _compute_boards_yearly {
                     author  => $author,
                     count   => scalar @$chain,
                     safe    => 0 + ( $chain->[0] eq $bins->[0] ),
-                    active  => 0 + ( $chain->[0] eq $bins->[0] ),
+                    active  => 0 + ( $chain->[0] eq $bins->[1] ),
                 },
                     map +{
                     contest => $year,
