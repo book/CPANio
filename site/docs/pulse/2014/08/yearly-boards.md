@@ -13,8 +13,8 @@ one would start afresh, and rank in the top if they never missed a week.
 Obviously, as soon as the game was on, there were people who managed to
 keep a chain unbroken for a whole year:
 
-- [2013](/board/once-a/week/2013.html): A<BARBIE>, A<BINGOS>, A<BOOK>, A<CJM>, A<ETHER>, A<FREW>, A<TOBYINK>, 52 weeks (the whole year)
-- [2012](/board/once-a/week/2012.html): A<CJM>, A<RJBS>, 53 weeks (the whole year)
+- [2013](/board/once-a/week/2013.html): A<BARBIE>, A<BINGOS>, A<BOOK>, A<CJM>, A<ETHER>, A<FREW>, A<TOBYINK>, 52 weeks
+- [2012](/board/once-a/week/2012.html): A<CJM>, A<RJBS>, 53 weeks
 
 This also means we can compute the yearly boards for past games, ever since
 CPAN started, before people came up with silly competitions about releases.
