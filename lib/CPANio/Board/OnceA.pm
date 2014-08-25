@@ -119,7 +119,9 @@ sub _compute_boards_current {
     }
 
     # sort chains
-    @entries = sort { $b->{count} <=> $a->{count} } @entries;
+    @entries = sort { $b->{count} <=> $a->{count} }
+        grep $_->{count} >= 2,
+        @entries;
 
     _commit_entries( $category, 'current', \@entries );
 }
@@ -154,7 +156,9 @@ sub _compute_boards_alltime {
     # sort chains, and keep only one per author
     my %seen;
     @entries = grep !$seen{ $_->{author} }++,
-        sort { $b->{count} <=> $a->{count} } @entries;
+        sort { $b->{count} <=> $a->{count} }
+        grep $_->{count} >= 2,
+        @entries;
 
     _commit_entries( $category, 'all-time', \@entries );
 }
@@ -197,7 +201,9 @@ sub _compute_boards_yearly {
         # sort chains, and keep only one per author
         my %seen;
         @entries = grep !$seen{ $_->{author} }++,
-            sort { $b->{count} <=> $a->{count} } @entries;
+            sort { $b->{count} <=> $a->{count} }
+            grep $_->{count} >= 2,
+            @entries;
 
         _commit_entries( $category, $year, \@entries );
     }
