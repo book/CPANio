@@ -113,9 +113,7 @@ div.navbar {
 }
 
 div.navbar * {
-    margin-left: 10px;
     margin-right: 10px;
-    padding: 2px 4px;
 }
 
 div.navbar a {

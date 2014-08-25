@@ -40,6 +40,10 @@ weekly chain for the whole year, and twice that they missed only one week:
 - [1996](/board/once-a/week/1996.html): A<DOUGM>, 8 weeks
 - [1995](/board/once-a/week/1995.html): A<ILYAZ>, 6 weeks
 
+The yearly boards are linked from the main [once-a-day](/board/once-a/day/),
+[once-a-week](/board/once-a/week/) and [once-a-month](/board/once-a/month/)
+pages.
+
 ## Fallen authors
 
 When an author misses a period (month, week or day), they immediately fall
