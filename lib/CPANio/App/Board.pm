@@ -71,6 +71,39 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
+    sub (/once-a/*/*) {
+        my ( $self, $category, $year, $env ) = @_;
+
+        return if $category !~ /^(?:day|week|month)$/;
+        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])$/;
+
+        my $schema   = $self->config->{schema};
+        my $tt       = $self->config->{template};
+        my $vars     = {
+            boards => {
+                map {
+                    (   $_ => {
+                            entries =>
+                                scalar $schema->resultset("OnceA\u$category")
+                                ->search(
+                                { contest  => $year },
+                                { order_by => [ 'rank', 'author' ] }
+                                ),
+                            title => $_
+                        }
+                        )
+                    } $year
+            },
+            limit    => 200,
+            period   => $category,
+            contests => [ $year ],
+        };
+        $tt->process( 'board/once_a/category_index', $vars, \my $output )
+            or die $tt->error();
+
+        [ 200, [ 'Content-type', 'text/html' ], [$output] ];
+    },
+
 }
 
 1;
