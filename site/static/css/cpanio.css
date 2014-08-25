@@ -94,6 +94,10 @@ tr.author td:first-child {
     font-size: 10pt;
 }
 
+.dimmed {
+    color: #999;
+}
+
 table.chain {
     font-size: 12pt;
 }
