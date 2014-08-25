@@ -1,0 +1,25 @@
+<h1>CPAN once-a-[% period %] contest for [% year %]</h1>
+<p>
+Release something to CPAN each [% period %]. How many [% period %]s can
+you keep that up?
+</p>
+<p>
+The tables below list the top participants up to rank [% limit %].
+</p>
+
+<table width="100%" align=center>
+    <tr valign=top>
+        [% FOREACH name IN contests ; board = boards.$name %]
+            <td align=center>
+            [% PROCESS board/once_a/leaderboard
+               title   = board.title
+               entries = board.entries
+               limit   = limit
+               url     = board.url
+               previous= board.previous
+               next    = board.next
+            %]
+            </td>
+        [% END %]
+    </tr>
+</table>

@@ -49,6 +49,11 @@ sub dispatch_request {
         my $vars     = {
             boards => {
                 map {
+                    my @yearly = /^[0-9]+$/ ? (
+                        url => "$_.html",
+                      ( previous => $_ - 1 )x!! ( $_ > 1995 ),
+                      ( next     => $_ + 1 )x!! ( $_ < 1900 + (gmtime)[5] ),
+                    ) : ();
                     (   $_ => {
                             entries =>
                                 scalar $schema->resultset("OnceA\u$category")
@@ -56,7 +61,8 @@ sub dispatch_request {
                                 { contest  => $_ },
                                 { order_by => [ 'rank', 'author' ] }
                                 ),
-                            title => $_
+                            title => $_,
+                            @yearly,
                         }
                         )
                     } @contests
@@ -86,10 +92,12 @@ sub dispatch_request {
                             entries =>
                                 scalar $schema->resultset("OnceA\u$category")
                                 ->search(
-                                { contest  => $year },
+                                { contest  => $_ },
                                 { order_by => [ 'rank', 'author' ] }
                                 ),
-                            title => $_
+                            title => $_,
+                          ( previous => $_ - 1 )x!! ( $_ > 1995 ),
+                          ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
                         }
                         )
                     } $year
@@ -97,8 +105,9 @@ sub dispatch_request {
             limit    => 200,
             period   => $category,
             contests => [ $year ],
+            year     => $year,
         };
-        $tt->process( 'board/once_a/category_index', $vars, \my $output )
+        $tt->process( 'board/once_a/year_index', $vars, \my $output )
             or die $tt->error();
 
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];

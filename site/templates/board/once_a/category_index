@@ -36,6 +36,9 @@ The tables below list the top participants up to rank [% limit %].
                title   = board.title
                entries = board.entries
                limit   = limit
+               url     = board.url
+               previous= board.previous
+               next    = board.next
             %]
             </td>
         [% END %]
