@@ -1,6 +1,5 @@
 <div class="navbar">
-    <img src="/img/cpanio-16.png" align="absmiddle" />
-    <a href="/">Home</a>
+    <a href="/"><img src="/img/cpanio-16.png" align="absmiddle" border="0" /></a>
     <a href="/pulse/">Pulse</a>
     <a href="/board/">Boards</a>
     <a href="/ref/">Reference</a>

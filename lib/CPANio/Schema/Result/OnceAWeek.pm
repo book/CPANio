@@ -11,6 +11,7 @@ __PACKAGE__->add_columns(
     count   => { data_type => 'integer', is_nullable => 0 },
     active  => { data_type => 'boolean', is_nullable => 0 },
     safe    => { data_type => 'boolean', is_nullable => 0 },
+    fallen  => { data_type => 'boolean', is_nullable => 0 },
 );
 
 1;

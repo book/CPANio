@@ -51,27 +51,35 @@ a {
     text-decoration: none;
 }
 
-tr.user.safe {
+tr.author.safe {
     background-color: #cceecc;
 }
 
-tr.user.active {
+tr.author.active {
     background-color: #ffff99;
 }
 
-tr.user.active:hover {
+tr.author.fallen {
+    background-color: #ff9999;
+}
+
+tr.author.active:hover {
     background-color: #E6E68A;
 }
 
-tr.user.safe:hover {
+tr.author.safe:hover {
     background-color: #bbddbb;
 }
 
-tr.user:hover {
+tr.author.fallen:hover {
+    background-color: #e68a8a;
+}
+
+tr.author:hover {
     background-color: #eaeaea;
 }
 
-tr.user td {
+tr.author td {
     margin-left: 0;
     margin-right: 0;
     padding-left: 10px;
@@ -79,7 +87,7 @@ tr.user td {
     border-top: solid 1px #fff;
 }
 
-tr.user td:first-child {
+tr.author td:first-child {
     margin-right: 0;
     text-align: right;
     color: #999;
