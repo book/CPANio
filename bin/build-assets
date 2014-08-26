@@ -7,6 +7,9 @@ for dir in $ASSETS $SITE/static/img ; do
     if [ ! -e $dir ] ; then mkdir -p $dir ; fi
 done
 
+# prevent ImageMagick from adding date:create and date:modify to PNG files
+PNG_OPTS="-define png:exclude-chunks=date"
+
 # the main icon
 convert -size 48x48 xc:none \
         -fill '#FF66CC' \
@@ -16,6 +19,7 @@ convert -size 48x48 xc:none \
         -draw "translate 37,11 circle 0,0 7,7" \
         -draw "translate 37,37 circle 0,0 7,7" \
         -blur 0x1 \
+        $PNG_OPTS \
         $ASSETS/cpanio-48.png
 
 # generate the smaller sizes
@@ -35,6 +39,7 @@ for label in CPAN io ; do
     convert \
         -background none -font $FONT \
        \( -gravity center -pointsize $FONTSIZE label:$label \) \
+        $PNG_OPTS \
        $ASSETS/$label.png
 done
 
@@ -46,8 +51,21 @@ convert \
     +append \
     -trim \
     +repage \
+    $PNG_OPTS \
     $ASSETS/logo.png
+
+# "fork me" ribbon
+# color change from http://www.imagemagick.org/Usage/color_mods/#clut
+convert \
+    "$ASSETS/github/forkme_light_background.psd[2,3,0]" \
+    -background transparent -layers merge \
+    -rotate 90 \
+    \( -size 1x6 gradient:'#FF66CC' \) -clut \
+    +repage \
+    $PNG_OPTS \
+    $ASSETS/forkme.png
 
 # move the assets we actually use to their final destination
 cp $ASSETS/favicon.ico $SITE/static/
 cp $ASSETS/logo.png    $SITE/static/img/
+cp $ASSETS/forkme.png  $SITE/static/img/
