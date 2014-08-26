@@ -3,6 +3,7 @@ package CPANio::App::Board;
 use Web::Simple;
 use Plack::Response;
 use CPANio::Schema;
+use POSIX qw( strftime );
 
 sub _build_final_dispatcher { sub () {} }
 
@@ -40,11 +41,15 @@ sub dispatch_request {
     sub (/once-a/*/) {
         my ( $self, $category, $env ) = @_;
 
-        return if $category !~ /^(?:day|week|month)$/;
+        return if $category !~ /^(?:day|week|month|hour)$/;
 
         my $year = 1900 + (gmtime)[5];
-        my @contests = ( 'current', $year, 'all-time' );
-        my $schema   = $self->config->{schema};
+        my $monthday = strftime "%m-%d", gmtime;
+        my @contests = ( $year, 'all-time' );
+        unshift @contests, 'current'
+            if $category ne 'hour'
+                || ( $monthday eq '08-16' || $monthday eq '08-27' );
+        my $schema = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
             boards => {
@@ -80,7 +85,7 @@ sub dispatch_request {
     sub (/once-a/*/*) {
         my ( $self, $category, $year, $env ) = @_;
 
-        return if $category !~ /^(?:day|week|month)$/;
+        return if $category !~ /^(?:day|week|month|hour)$/;
         return if $year !~ /^(?:199[5-9]|20[0-9][0-9])$/;
 
         my $schema   = $self->config->{schema};
