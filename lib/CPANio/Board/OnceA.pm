@@ -9,11 +9,12 @@ use CPANio::Board;
 our @ISA = qw( CPANio::Board );
 
 # CONSTANTS
-my @CATEGORIES = qw( month week day );
+my @CATEGORIES = qw( month week day hour );
 my %LIKE = (
     month => 'M%',
     week  => 'W%',
     day   => 'D%',
+    hour  => 'H%',
 );
 
 # PRIVATE FUNCTIONS
