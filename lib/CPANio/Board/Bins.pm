@@ -36,8 +36,8 @@ sub _final_week_number {
 # given an epoch time, return all the bins the dist belongs to
 sub _datetime_to_bins {
     my $dt = shift;
-    my ( $year, $month, $day, $week_year, $week_number ) = split / /,
-        $dt->strftime('%Y %m %d %Y %U');
+    my ( $year, $month, $day, $hour, $week_year, $week_number ) = split / /,
+        $dt->strftime('%Y %m %d %H %Y %U');
 
     # week 0 is actually the last week of the previous year
     if ( $week_number == 0 ) {
@@ -50,6 +50,7 @@ sub _datetime_to_bins {
         "M$year-$month",               # month
         "W$week_year-$week_number",    # week
         "D$year-$month-$day",          # day
+        "$month-$day" eq '08-16' ? "H$year-$hour" : (),    # hour
         ;
 }
 
