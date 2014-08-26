@@ -1,3 +1,7 @@
+<a href="https://github.com/book/CPANio">
+  <img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme.png">
+</a>
+
 <div align="center">
   <img src="/img/logo.png" /><br />
   <span style="font-size:30px"><b>Playing the CPAN game</b></span>
