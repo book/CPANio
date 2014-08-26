@@ -35,7 +35,7 @@ sub _final_week_number {
 
 # given an epoch time, return all the bins the dist belongs to
 sub _datetime_to_bins {
-    my $dt = shift;
+    my ( $dt, $author ) = @_;
     my ( $year, $month, $day, $hour, $week_year, $week_number ) = split / /,
         $dt->strftime('%Y %m %d %H %Y %U');
 
@@ -50,7 +50,11 @@ sub _datetime_to_bins {
         "M$year-$month",               # month
         "W$week_year-$week_number",    # week
         "D$year-$month-$day",          # day
-        "$month-$day" eq '08-16' ? "H$year-$hour" : (),    # hour
+        "$month-$day" eq '08-16'       # hour on CPAN Day
+        ? $author
+            ? "H$year-$hour"
+            : ( map "H$year-$_", '00' .. '23' )
+        : (),
         ;
 }
 
@@ -102,7 +106,7 @@ sub _update_author_bins {
         my $author = $release->cpanid;
         $latest_release = $release->date;
         my $dt = DateTime->from_epoch( epoch => $latest_release );
-        $bins{$_}{$author}++ for _datetime_to_bins($dt);
+        $bins{$_}{$author}++ for _datetime_to_bins( $dt, $author );
     }
 
     my $bins_rs = $CPANio::schema->resultset('ReleaseBins');
