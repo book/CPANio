@@ -54,6 +54,18 @@ convert \
     $PNG_OPTS \
     $ASSETS/logo.png
 
+# "fork me" ribbon
+# color change from http://www.imagemagick.org/Usage/color_mods/#clut
+convert \
+    "$ASSETS/github/forkme_light_background.psd[2,3,0]" \
+    -background transparent -layers merge \
+    -rotate 90 \
+    \( -size 1x6 gradient:'#FF66CC' \) -clut \
+    +repage \
+    $PNG_OPTS \
+    $ASSETS/forkme.png
+
 # move the assets we actually use to their final destination
 cp $ASSETS/favicon.ico $SITE/static/
 cp $ASSETS/logo.png    $SITE/static/img/
+cp $ASSETS/forkme.png  $SITE/static/img/
