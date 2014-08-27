@@ -51,8 +51,8 @@ sub _datetime_to_bins {
         "W$week_year-$week_number",    # week
         "D$year-$month-$day",          # day
         $author                        # hour
-            ? "H$year-$hour"
-            : ( map "H$year-$_", '00' .. '23' ),
+            ? "H$year-$month-$day-$hour"
+            : ( map "H$year-$month-$day-$_", '00' .. '23' ),
         ;
 
 }
