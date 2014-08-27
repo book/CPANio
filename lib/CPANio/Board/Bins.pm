@@ -50,12 +50,11 @@ sub _datetime_to_bins {
         "M$year-$month",               # month
         "W$week_year-$week_number",    # week
         "D$year-$month-$day",          # day
-        "$month-$day" eq '08-16'       # hour on CPAN Day
-        ? $author
+        $author                        # hour
             ? "H$year-$hour"
-            : ( map "H$year-$_", '00' .. '23' )
-        : (),
+            : ( map "H$year-$_", '00' .. '23' ),
         ;
+
 }
 
 sub _update_empty_bins {
