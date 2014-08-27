@@ -2,9 +2,9 @@
   <thead>
     <tr>
       <th colspan=3>
-       [% IF next %]<a href="[% next %].html">«</a> [% ELSIF previous %]<span class="dimmed">«</span> [% END %]
+       [% IF previous %]<a href="[% previous %].html">«</a> [% ELSIF next %]<span class="dimmed">«</span> [% END %]
        [% url ? "<a href=\"$url\">$title</a>" : "$title" %]
-       [% IF previous %] <a href="[% previous %].html">»</a>[% ELSIF next %] <span class="dimmed">»</span>[%END -%]
+       [% IF next %] <a href="[% next %].html">»</a>[% ELSIF previous %] <span class="dimmed">»</span>[%END -%]
       </th>
     </tr>
   </thead>
