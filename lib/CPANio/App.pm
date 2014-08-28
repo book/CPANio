@@ -76,6 +76,7 @@ sub dispatch_request {
 
                 # do not deal with streams
                 return if ref $res->[2] ne 'ARRAY';
+                return if $res->[0] ne '200';
 
                 my $tt = $self->config->{template};
                 $tt->process(
