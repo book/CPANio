@@ -11,7 +11,6 @@ our @ISA = qw( CPANio::Board );
 use CPANio::Board::Bins;
 
 # CONSTANTS
-my @CATEGORIES = qw( month week day );
 my %LIKE = (
     month => 'M%',
     week  => 'W%',
@@ -21,11 +20,12 @@ my %LIKE = (
 # PRIVATE FUNCTIONS
 
 sub _find_authors_chains {
+    my ( $board, @categories ) = @_;
     my $schema  = $CPANio::schema;
-    my $bins_rs = $schema->resultset('ReleaseBins');
+    my $bins_rs = $schema->resultset("\u${board}Bins");
 
     my %chains;
-    for my $category (@CATEGORIES) {
+    for my $category (@categories) {
 
         # pick the bins for the current category
         my $bins = CPANio::Board::Bins->bins_since()->{$category};
@@ -198,6 +198,20 @@ sub _compute_boards_yearly {
     }
 }
 
+sub _update_board {
+    my ( $board, @categories ) = @_;
+
+    # pick up all the chains
+    my $chains = _find_authors_chains( $board, @categories );
+
+    # compute all contests
+    for my $category (@categories) {
+        _compute_boards_current( $chains, $category );
+        _compute_boards_alltime( $chains, $category );
+        _compute_boards_yearly( $chains, $category );
+    }
+}
+
 # CLASS METHODS
 sub board_name { 'once-a' }
 
@@ -205,18 +219,10 @@ sub update {
     my $since = __PACKAGE__->latest_update;
 
     # we depend on the bins
-    require CPANio::Board::Bins;
     return if $since > CPANio::Board::Bins->latest_update;
 
-    # pick up all the chains
-    my $chains = _find_authors_chains();
-
-    # compute all contests
-    for my $category (@CATEGORIES) {
-        _compute_boards_current( $chains, $category );
-        _compute_boards_alltime( $chains, $category );
-        _compute_boards_yearly( $chains, $category );
-    }
+    # do all the boards
+    _update_board( release => qw( month week day ) );    # regulars
 
     __PACKAGE__->update_done();
 }
