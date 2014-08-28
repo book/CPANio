@@ -8,6 +8,8 @@ use CPANio;
 use CPANio::Board;
 our @ISA = qw( CPANio::Board );
 
+use CPANio::Board::Bins;
+
 # CONSTANTS
 my @CATEGORIES = qw( month week day );
 my %LIKE = (
@@ -17,19 +19,6 @@ my %LIKE = (
 );
 
 # PRIVATE FUNCTIONS
-sub _get_bins_for {
-    my ($category) = @_;
-    state %bins;
-
-    return $bins{$category} ||= [
-        $CPANio::schema->resultset('ReleaseBins')->search(
-            {   author => '',
-                bin    => { like => $LIKE{$category} },
-            },
-            { order_by => { -desc => 'bin' } }
-        )->get_column('bin')->all
-    ];
-}
 
 sub _find_authors_chains {
     my $schema  = $CPANio::schema;
@@ -39,7 +28,7 @@ sub _find_authors_chains {
     for my $category (@CATEGORIES) {
 
         # pick the bins for the current category
-        my @bins = @{ _get_bins_for($category) };
+        my $bins = CPANio::Board::Bins->bins_since()->{$category};
 
         # get the list of bins for all the authors
         my %bins;
@@ -57,9 +46,9 @@ sub _find_authors_chains {
 
             # split the bins into chains
             while (@$Bins) {
-                $i++ while $Bins->[0] ne $bins[$i];
+                $i++ while $Bins->[0] ne $bins->[$i];
                 my $j = 0;
-                while ( $Bins->[$j] eq $bins[$i] ) {
+                while ( $Bins->[$j] eq $bins->[$i] ) {
                     $i++;
                     $j++;
                     last if $j >= @$Bins;
@@ -97,7 +86,7 @@ sub _compute_boards_current {
     my ( $chains, $category ) = @_;
 
     # pick the bins for the current category
-    my $bins = _get_bins_for($category);
+    my $bins = CPANio::Board::Bins->bins_since()->{$category};
 
     # only keep the active chains
     my @entries;
@@ -130,7 +119,7 @@ sub _compute_boards_alltime {
     my ( $chains, $category ) = @_;
 
     # pick the bins for the current category
-    my $bins = _get_bins_for($category);
+    my $bins = CPANio::Board::Bins->bins_since()->{$category};
 
     my @entries = map {
         my $author = $_;
@@ -168,7 +157,7 @@ sub _compute_boards_yearly {
     my @years = ( 1995 .. 1900 + (gmtime)[5] );
 
     # pick the bins for the current category
-    my $bins = _get_bins_for($category);
+    my $bins = CPANio::Board::Bins->bins_since()->{$category};
 
     for my $year (@years) {
         my @entries = map {

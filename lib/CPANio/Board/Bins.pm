@@ -46,39 +46,11 @@ sub _datetime_to_bins {
     }
 
     # all the bins for this date
-    return                             # once-a
-        "M$year-$month",               # month
-        "W$week_year-$week_number",    # week
-        "D$year-$month-$day",          # day
+    return
+        month => "M$year-$month",
+        week  => "W$week_year-$week_number",
+        day   => "D$year-$month-$day",
         ;
-}
-
-sub _update_empty_bins {
-    my ($since) = @_;
-
-    # start at the beginning of the given day
-    my $dt = DateTime->from_epoch(
-        epoch => $since || $FIRST_RELEASE_TIME,
-        time_zone => 'UTC'
-    );
-    $dt->set( hour => 0, minute => 0, second => 0 );
-
-    # create all bins until NOW
-    my $now = time;
-    my %bins;
-    while ( $dt->epoch < $now ) {
-        $bins{$_} = 0 for _datetime_to_bins($dt);
-        $dt->add( days => 1 );
-    }
-
-    my $bins_rs = $CPANio::schema->resultset('ReleaseBins');
-    if ( $bins_rs->search( { author => '' } )->count ) {    # update
-        $bins_rs->update_or_create( { bin => $_, author => '' } )
-            for keys %bins;
-    }
-    else {                                                  # create
-        $bins_rs->populate( [ map +{ bin => $_ }, keys %bins ] );
-    }
 }
 
 sub _update_author_bins {
@@ -101,7 +73,8 @@ sub _update_author_bins {
         my $author = $release->cpanid;
         $latest_release = $release->date;
         my $dt = DateTime->from_epoch( epoch => $latest_release );
-        $bins{$_}{$author}++ for _datetime_to_bins($dt);
+        my $i;
+        $bins{$_}{$author}++ for grep ++$i % 2, _datetime_to_bins($dt);
     }
 
     my $bins_rs = $CPANio::schema->resultset('ReleaseBins');
@@ -137,9 +110,37 @@ sub _update_author_bins {
 # CLASS METHODS
 sub board_name { 'bins' }
 
+sub bins_since {
+    my ($class, $since) = @_;
+    $since ||= $FIRST_RELEASE_TIME;
+    state $Since;
+    state %bins;
+
+    # we might have already cached it
+    return \%bins if defined $Since && $since eq $Since;
+
+    # start at the beginning of the given day
+    my $dt = DateTime->from_epoch( epoch => $since, time_zone => 'UTC' );
+    $dt->set( hour => 0, minute => 0, second => 0 );
+
+    # create all bins until NOW
+    %bins = ();
+    my $now = time;
+    while ( $dt->epoch < $now ) {
+        my @kv = _datetime_to_bins($dt);
+        $bins{ shift @kv }{ shift @kv } = 0 while @kv;
+        $dt->add( days => 1 );
+    }
+    $bins{$_} = [ reverse sort keys %{ $bins{$_} } ] for keys %bins;
+
+    # cache the bins, and the argument use to generate them
+    $Since = $since;
+
+    return \%bins;
+}
+
 sub update {
     my $since = __PACKAGE__->latest_update;
-    _update_empty_bins($since);
     my $latest_release = _update_author_bins($since);
     __PACKAGE__->update_done($latest_release);
 }
