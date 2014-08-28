@@ -76,7 +76,10 @@ sub dispatch_request {
 
                 # do not deal with streams
                 return if ref $res->[2] ne 'ARRAY';
-                return if $res->[0] ne '200';
+
+                # only wrap text/html responses in the html layout
+                my $headers = HTTP::Headers->new( @{$res->[1]} );
+                return if $headers->content_type ne 'text/html';
 
                 my $tt = $self->config->{template};
                 $tt->process(
