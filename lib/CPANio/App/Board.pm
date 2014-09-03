@@ -9,6 +9,9 @@ sub _build_final_dispatcher { sub () {} }
 sub dispatch_request {
     my ($self) = @_;
 
+    my $order_by
+        = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
+
     sub (/once-a/) {
         my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
@@ -20,7 +23,7 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$_")
                                 ->search(
                                 { contest  => 'current' },
-                                { order_by => [ 'rank', 'count', 'author' ] }
+                                { order_by => $order_by },
                                 ),
                             title => "once a $_",
                             url   => "$_/",
@@ -59,7 +62,7 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$category")
                                 ->search(
                                 { contest  => $_ },
-                                { order_by => [ 'rank', 'count', 'author' ] }
+                                { order_by => $order_by },
                                 ),
                             title => $_,
                             @yearly,
@@ -93,7 +96,7 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$category")
                                 ->search(
                                 { contest  => $_ },
-                                { order_by => [ 'rank', 'count', 'author' ] }
+                                { order_by => $order_by },
                                 ),
                             title => $_,
                           ( previous => $_ - 1 )x!! ( $_ > 1995 ),
