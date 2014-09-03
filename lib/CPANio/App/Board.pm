@@ -20,7 +20,7 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$_")
                                 ->search(
                                 { contest  => 'current' },
-                                { order_by => [ 'rank', 'author' ] }
+                                { order_by => [ 'rank', 'count', 'author' ] }
                                 ),
                             title => "once a $_",
                             url   => "$_/",
@@ -59,7 +59,7 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$category")
                                 ->search(
                                 { contest  => $_ },
-                                { order_by => [ 'rank', 'author' ] }
+                                { order_by => [ 'rank', 'count', 'author' ] }
                                 ),
                             title => $_,
                             @yearly,
@@ -93,7 +93,7 @@ sub dispatch_request {
                                 scalar $schema->resultset("OnceA\u$category")
                                 ->search(
                                 { contest  => $_ },
-                                { order_by => [ 'rank', 'author' ] }
+                                { order_by => [ 'rank', 'count', 'author' ] }
                                 ),
                             title => $_,
                           ( previous => $_ - 1 )x!! ( $_ > 1995 ),
