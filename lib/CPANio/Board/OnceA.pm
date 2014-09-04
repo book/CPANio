@@ -80,8 +80,10 @@ sub _commit_entries {
 
     # compute rank
     my $Rank = my $rank = my $prev = 0;
+    my %seen;
     for my $entry (@$entries) {
-        $Rank++ unless $entry->{fallen} && $contest eq 'current';
+        $Rank++ unless $seen{ $entry->{author} }++    # rank each author once
+                || ( $entry->{fallen} && $contest eq 'current' );
         $rank          = $Rank if $entry->{count} != $prev;
         $prev          = $entry->{count};
         $entry->{rank} = $rank;
@@ -155,7 +157,7 @@ sub _compute_boards_alltime {
 
     # sort chains, and keep only one per author
     my %seen;
-    @entries = grep !$seen{ $_->{author} }++,
+    @entries = grep $seen{ $_->{author} }++ ? $_->{safe} || $_->{active} || $_->{fallen} : 1,
         sort { $b->{count} <=> $a->{count} }
         grep $_->{count} >= 2,
         @entries;
@@ -200,7 +202,7 @@ sub _compute_boards_yearly {
 
         # sort chains, and keep only one per author
         my %seen;
-        @entries = grep !$seen{ $_->{author} }++,
+        @entries = grep $seen{ $_->{author} }++ ? $_->{safe} || $_->{active} || $_->{fallen} : 1,
             sort { $b->{count} <=> $a->{count} }
             grep $_->{count} >= 2,
             @entries;
