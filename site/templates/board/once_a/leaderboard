@@ -8,13 +8,13 @@
       </th>
     </tr>
   </thead>
-  <tbody>
-  [% WHILE ( entry = entries.next ) %][% LAST IF limit.defined && entry.rank > limit %]
+  <tbody>[% seen = {} %]
+  [% WHILE ( entry = entries.next ) %][% LAST IF limit.defined && entry.rank > limit %][% del = ( title == 'current' && entry.fallen ) || seen.${entry.author} %]
     <tr class="author[% IF entry.safe %] safe[% ELSIF entry.active %] active[% ELSIF entry.fallen %] fallen[% END %]">
       <td align=left>[% entry.rank == prev ? '-&nbsp;' : entry.rank _ '.' %]</td>
-      <td align=left><a href="https://metacpan.org/author/[% entry.author %]">[% entry.author %]</a></td>
+      <td align=left>[% IF del %]<del>[% END %]<a href="https://metacpan.org/author/[% entry.author %]">[% entry.author %]</a>[% IF del %]</del>[% END %]</td>
       <td align=right>[% entry.count %]</td>
     </tr>
-  [% prev = entry.rank ; END %]
+  [% prev = entry.rank ; seen.${entry.author} = 1 ; END %]
   </tbody>
 </table>
