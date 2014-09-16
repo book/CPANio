@@ -6,8 +6,8 @@ __PACKAGE__->table('release_bins');
 
 __PACKAGE__->add_columns(
     bin    => { data_type => 'text',    is_nullable => 0 },
-    author => { data_type => 'text',    is_nullable => 0, default => '' },
-    count  => { data_type => 'integer', is_nullable => 0, default => 0 },
+    author => { data_type => 'text',    is_nullable => 0, default_value => '' },
+    count  => { data_type => 'integer', is_nullable => 0, default_value => 0 },
 );
 
 __PACKAGE__->set_primary_key( 'bin', 'author' );

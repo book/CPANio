@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use Path::Class;
+
+BEGIN {
+    unshift @INC, dir($FindBin::Bin)->parent->subdir('lib')->stringify;
+}
+
+use CPANio;
+
+$CPANio::schema->deploy( { add_drop_table => 1, quote_identifiers => 1 } );
