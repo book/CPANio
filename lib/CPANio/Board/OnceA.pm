@@ -121,7 +121,7 @@ sub _compute_boards_current {
     }
 
     # sort chains
-    @entries = sort { $b->{count} <=> $a->{count} }
+    @entries = sort { $b->{count} <=> $a->{count} || $a->{fallen} <=> $b->{fallen} }
         grep $_->{count} >= 2,
         @entries;
 
