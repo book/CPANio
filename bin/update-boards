@@ -15,7 +15,7 @@ BEGIN {
 
 use CPANio;
 
-my @boards = qw( Bins OnceA );
+my @boards = qw( OnceA );
 
 for my $board ( @boards ) {
     require "CPANio/Board/$board.pm";

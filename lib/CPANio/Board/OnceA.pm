@@ -8,7 +8,7 @@ use CPANio;
 use CPANio::Board;
 our @ISA = qw( CPANio::Board );
 
-use CPANio::Board::Bins;
+use CPANio::Bins;
 
 # CONSTANTS
 my %LIKE = (
@@ -28,7 +28,7 @@ sub _find_authors_chains {
     for my $category (@categories) {
 
         # pick the bins for the current category
-        my $bins = CPANio::Board::Bins->bins_since()->{$category};
+        my $bins = CPANio::Bins->bins_since()->{$category};
 
         # get the list of bins for all the authors
         my %bins;
@@ -86,7 +86,7 @@ sub _compute_boards_current {
     my ( $chains, $category ) = @_;
 
     # pick the bins for the current category
-    my $bins = CPANio::Board::Bins->bins_since()->{$category};
+    my $bins = CPANio::Bins->bins_since()->{$category};
 
     # only keep the active chains
     my @entries;
@@ -119,7 +119,7 @@ sub _compute_boards_alltime {
     my ( $chains, $category ) = @_;
 
     # pick the bins for the current category
-    my $bins = CPANio::Board::Bins->bins_since()->{$category};
+    my $bins = CPANio::Bins->bins_since()->{$category};
 
     my @entries = map {
         my $author = $_;
@@ -157,7 +157,7 @@ sub _compute_boards_yearly {
     my @years = ( 1995 .. 1900 + (gmtime)[5] );
 
     # pick the bins for the current category
-    my $bins = CPANio::Board::Bins->bins_since()->{$category};
+    my $bins = CPANio::Bins->bins_since()->{$category};
 
     for my $year (@years) {
         my @entries = map {
@@ -217,9 +217,6 @@ sub board_name { 'once-a' }
 
 sub update {
     my $since = __PACKAGE__->latest_update;
-
-    # we depend on the bins
-    return if $since > CPANio::Board::Bins->latest_update;
 
     # do all the boards
     _update_board( release => qw( month week day ) );    # regulars
