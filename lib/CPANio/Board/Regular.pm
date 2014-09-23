@@ -203,6 +203,18 @@ sub _compute_boards_yearly {
     }
 }
 
+# VIRTUAL METHODS
+
+sub update_author_bins {
+    my ($class) = @_;
+    die "update_author_bins not defined for $class";
+}
+
+sub periods {
+    my ($class) = @_;
+    die "periods not defined for $class";
+}
+
 # CLASS METHODS
 
 sub latest_bins_update {
@@ -242,4 +254,10 @@ sub update_board {
     }
 }
 
+sub update {
+    my ($class) = @_;
+    $class->update_author_bins();
+    $class->update_board( $class->periods );
+    $class->update_done();
+}
 1;

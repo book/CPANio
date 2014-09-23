@@ -9,8 +9,8 @@ our @ISA = qw( CPANio::Board::Regular );
 
 # PRIVATE FUNCTIONS
 
-sub _update_author_bins {
-    my ($since) = @_;
+sub update_author_bins {
+    my ( $class, $since ) = @_;
     my %bins;
     my $latest_release;
     my $releases = __PACKAGE__->get_releases;
@@ -53,14 +53,10 @@ sub _update_author_bins {
 }
 
 # CLASS METHODS
-sub board_name { 'regular-releases' }
+sub board_name { 'releases' }
 
 sub resultclass_name { 'ReleaseBins' }
 
-sub update {
-    _update_author_bins();
-    __PACKAGE__->update_board( qw( month week day ) );
-    __PACKAGE__->update_done();
-}
+sub periods {qw( month week day )}
 
 1;
