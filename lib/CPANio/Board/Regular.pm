@@ -1,4 +1,4 @@
-package CPANio::Board::OnceA;
+package CPANio::Board::Regular;
 
 use 5.010;
 use strict;
@@ -17,12 +17,17 @@ my %LIKE = (
     day   => 'D%',
 );
 
+sub resultclass_name {
+    my ($class) = @_;
+    die "resultclass_name not defined for $class";
+}
+
 # PRIVATE FUNCTIONS
 
-sub _find_authors_chains {
-    my ( $board, @categories ) = @_;
+sub _authors_chains {
+    my ( $resultclass_name, @categories ) = @_;
     my $schema  = $CPANio::schema;
-    my $bins_rs = $schema->resultset("\u${board}Bins");
+    my $bins_rs = $schema->resultset($resultclass_name);
 
     my %chains;
     for my $category (@categories) {
@@ -198,11 +203,36 @@ sub _compute_boards_yearly {
     }
 }
 
-sub _update_board {
-    my ( $board, @categories ) = @_;
+# CLASS METHODS
+
+sub latest_bins_update {
+    my $class = shift;
+    my $bin = $CPANio::schema->resultset( $class->resultclass_name )
+        ->search( { bin => { like => 'D%' } } )->get_column('bin')->max;
+    return $bin
+        ? CPANio::Bins->bin_to_epoch($bin)
+        : $CPANio::Bins::FIRST_RELEASE_TIME;
+}
+
+sub get_releases {
+    my $class = shift;
+
+    my $backpan = BackPAN::Index->new(
+        cache_ttl => 3600,    # 1 hour
+        backpan_index_url =>
+            "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
+    );
+
+    return BackPAN::Index->new->releases->search(
+        { date     => { '>', $class->latest_bins_update } },
+        { order_by => 'date' } );
+}
+
+sub update_board {
+    my ( $class, @categories ) = @_;
 
     # pick up all the chains
-    my $chains = _find_authors_chains( $board, @categories );
+    my $chains = _authors_chains( $class->resultclass_name, @categories );
 
     # compute all contests
     for my $category (@categories) {
@@ -210,18 +240,6 @@ sub _update_board {
         _compute_boards_alltime( $chains, $category );
         _compute_boards_yearly( $chains, $category );
     }
-}
-
-# CLASS METHODS
-sub board_name { 'once-a' }
-
-sub update {
-    my $since = __PACKAGE__->latest_update;
-
-    # do all the boards
-    _update_board( release => qw( month week day ) );    # regulars
-
-    __PACKAGE__->update_done();
 }
 
 1;

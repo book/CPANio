@@ -15,9 +15,10 @@ BEGIN {
 
 use CPANio;
 
-my @boards = qw( OnceA );
+my @boards = qw( Regular::Releases );
 
-for my $board ( @boards ) {
-    require "CPANio/Board/$board.pm";
+for my $board (@boards) {
+    ( my $file = $board ) =~ s{::}{/}g;
+    require "CPANio/Board/$file.pm";
     "CPANio::Board::$board"->update;
 }
