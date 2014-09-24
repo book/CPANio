@@ -9,7 +9,7 @@ The tables below list the top participants up to rank [% limit %].
 
 <table width="100%" align=center>
     <tr valign=top>
-        [% FOREACH name IN contests ; board = boards.$name %]
+        [% FOREACH board IN boards %]
             <td align=center>
             [% PROCESS board/once_a/leaderboard
                title   = board.title

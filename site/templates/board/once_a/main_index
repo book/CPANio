@@ -22,9 +22,9 @@ The tables below list the top [% limit %] participants in the "current" contest
 (all chains still under construction).
 </p>
 
-<table width="100%" align=center>
+<table width="100%" align="center">
     <tr valign=top>
-        [% FOREACH name IN [ 'month', 'week', 'day' ] ; board = boards.$name %]
+        [% FOREACH board IN boards %]
             <td align=center>
             [% PROCESS board/once_a/leaderboard
                title   = board.title

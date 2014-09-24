@@ -13,21 +13,17 @@ sub dispatch_request {
         my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
-            boards => {
-                map {
-                    (   $_ => {
-                            entries =>
-                                scalar $schema->resultset("OnceA\u$_")
-                                ->search(
-                                { contest  => 'current' },
-                                { order_by => [ 'rank', 'author' ] }
-                                ),
-                            title => "once a $_",
-                            url   => "$_/",
-                        }
-                        )
-                    } qw( day week month )
-            },
+            boards => [
+                map +{
+                    entries => scalar $schema->resultset("OnceA\u$_")->search(
+                        { contest  => 'current' },
+                        { order_by => [ 'rank', 'author' ] }
+                    ),
+                    title => "once a $_",
+                    url   => "$_/",
+                },
+                qw( month week day )
+            ],
             limit => 10,
         };
 
@@ -47,26 +43,24 @@ sub dispatch_request {
         my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
-            boards => {
+            boards => [
                 map {
                     my @yearly = /^[0-9]+$/ ? (
                         url => "$_.html",
                       ( previous => $_ - 1 )x!! ( $_ > 1995 ),
                       ( next     => $_ + 1 )x!! ( $_ < 1900 + (gmtime)[5] ),
                     ) : ();
-                    (   $_ => {
-                            entries =>
-                                scalar $schema->resultset("OnceA\u$category")
-                                ->search(
-                                { contest  => $_ },
-                                { order_by => [ 'rank', 'author' ] }
-                                ),
-                            title => $_,
-                            @yearly,
-                        }
-                        )
-                    } @contests
-            },
+                    {   entries =>
+                            scalar $schema->resultset("OnceA\u$category")
+                            ->search(
+                            { contest  => $_ },
+                            { order_by => [ 'rank', 'author' ] }
+                            ),
+                        title => $_,
+                        @yearly,
+                    }
+                } @contests
+            ],
             limit    => 200,
             period   => $category,
             contests => \@contests,
@@ -86,27 +80,25 @@ sub dispatch_request {
         my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
-            boards => {
-                map {
-                    (   $_ => {
-                            entries =>
-                                scalar $schema->resultset("OnceA\u$category")
-                                ->search(
-                                { contest  => $_ },
-                                { order_by => [ 'rank', 'author' ] }
-                                ),
-                            title => $_,
-                          ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                          ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
-                        }
-                        )
-                    } $year
-            },
+            boards => [
+                map +{
+                    entries =>
+                        scalar $schema->resultset("OnceA\u$category")->search(
+                        { contest  => $_ },
+                        { order_by => [ 'rank', 'author' ] }
+                        ),
+                    title => $_,
+                  ( previous => $_ - 1 )x!! ( $_ > 1995 ),
+                  ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
+                },
+                $year
+            ],
             limit    => 200,
             period   => $category,
-            contests => [ $year ],
+            contests => [$year],
             year     => $year,
         };
+
         $tt->process( 'board/once_a/year_index', $vars, \my $output )
             or die $tt->error();
 
