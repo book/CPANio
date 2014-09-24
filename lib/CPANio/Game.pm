@@ -1,4 +1,4 @@
-package CPANio::Board;
+package CPANio::Game;
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use CPANio;
 
 # VIRTUAL METHODS
 
-sub board_name {
+sub game_name {
     my ($class) = @_;
     die "board_name not defined for $class";
 }
@@ -22,7 +22,7 @@ sub latest_update {
     my ($class) = @_;
     return eval {
         $CPANio::schema->resultset('Timestamps')
-            ->find( { board => $class->board_name } )->latest_update;
+            ->find( { game => $class->game_name } )->latest_update;
     } || 0;
 }
 
@@ -33,7 +33,7 @@ sub update_done {
         sub {
             $CPANio::schema->resultset('Timestamps')
                 ->update_or_create(
-                { board => $class->board_name, latest_update => $time } );
+                { game => $class->game_name, latest_update => $time } );
         }
     );
     return $time;

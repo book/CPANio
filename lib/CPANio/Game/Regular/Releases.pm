@@ -1,11 +1,11 @@
-package CPANio::Board::Regular::Releases;
+package CPANio::Game::Regular::Releases;
 
 use strict;
 use warnings;
 
 use CPANio;
-use CPANio::Board::Regular;
-our @ISA = qw( CPANio::Board::Regular );
+use CPANio::Game::Regular;
+our @ISA = qw( CPANio::Game::Regular );
 
 # PRIVATE FUNCTIONS
 
@@ -53,7 +53,7 @@ sub update_author_bins {
 }
 
 # CLASS METHODS
-sub board_name { 'releases' }
+sub game_name { 'releases' }
 
 sub resultclass_name { 'ReleaseBins' }
 
@@ -65,22 +65,23 @@ __END__
 
 =head1 NAME
 
-CPANio::Board::Regular::Releases - Compute the board for regular releases
+CPANio::Game::Regular::Releases - Compute the boards for regular releases
 
 =head1 SYNPOPSIS
 
-    use CPANio::Board::Regular::Releases;
+    use CPANio::Game::Regular::Releases;
 
-    CPANio::Board::Regular::Releases->update;
+    CPANio::Game::Regular::Releases->update;
 
 =head1 DESCRIPTION
 
-This board computes the chains for "regular releases", i.e. authors who
-publish a new CPAN release at least once every period.
+This board computes the chains for "regular releases" game, i.e. authors
+who publish a new CPAN release at least once every period.
 
 =head2 Periods
 
-This board is computed for every month, week and day.
+The boards for this game are computed for the following periods:
+month, week and day.
 
 =head1 AUTHOR
 
