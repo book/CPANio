@@ -5,6 +5,7 @@ use base qw/DBIx::Class::Core/;
 __PACKAGE__->table('once_a_day');
 
 __PACKAGE__->add_columns(
+    board   => { data_type => 'text',    is_nullable => 0 },
     contest => { data_type => 'text',    is_nullable => 0 },
     rank    => { data_type => 'integer', is_nullable => 0 },
     author  => { data_type => 'text',    is_nullable => 0 },

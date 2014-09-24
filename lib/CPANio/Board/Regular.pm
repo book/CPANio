@@ -88,7 +88,7 @@ sub _commit_entries {
 }
 
 sub _compute_boards_current {
-    my ( $chains, $category ) = @_;
+    my ( $chains, $board, $category ) = @_;
 
     # pick the bins for the current category
     my $bins = CPANio::Bins->bins_since()->{$category};
@@ -102,6 +102,7 @@ sub _compute_boards_current {
             || $chain->[0] eq $bins->[2] )
         {
             push @entries, {
+                board   => $board,
                 contest => 'current',
                 author  => $author,
                 count   => scalar @$chain,
@@ -121,7 +122,7 @@ sub _compute_boards_current {
 }
 
 sub _compute_boards_alltime {
-    my ( $chains, $category ) = @_;
+    my ( $chains, $board, $category ) = @_;
 
     # pick the bins for the current category
     my $bins = CPANio::Bins->bins_since()->{$category};
@@ -130,7 +131,8 @@ sub _compute_boards_alltime {
         my $author = $_;
         my @chains = @{ $chains->{$category}{$author} };
         my $chain  = shift @chains;                  # possibly active
-        {   contest => 'all-time',
+        {   board   => $board,
+            contest => 'all-time',
             author  => $author,
             count   => scalar @$chain,
             safe    => 0 + ( $chain->[0] eq $bins->[0] ),
@@ -138,6 +140,7 @@ sub _compute_boards_alltime {
             fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
         },
             map +{
+            board   => $board,
             contest => 'all-time',
             author  => $author,
             count   => scalar @$_,
@@ -158,7 +161,7 @@ sub _compute_boards_alltime {
 }
 
 sub _compute_boards_yearly {
-    my ( $chains, $category ) = @_;
+    my ( $chains, $board, $category ) = @_;
     my @years = ( 1995 .. 1900 + (gmtime)[5] );
 
     # pick the bins for the current category
@@ -172,7 +175,8 @@ sub _compute_boards_yearly {
             @chains
                 ? do {
                 my $chain = shift @chains;    # possibly active
-                {   contest => $year,
+                {   board   => $board,
+                    contest => $year,
                     author  => $author,
                     count   => scalar @$chain,
                     safe    => 0 + ( $chain->[0] eq $bins->[0] ),
@@ -180,6 +184,7 @@ sub _compute_boards_yearly {
                     fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
                 },
                     map +{
+                    board   => $board,
                     contest => $year,
                     author  => $author,
                     count   => scalar @$_,
@@ -248,9 +253,9 @@ sub update_board {
 
     # compute all contests
     for my $category (@categories) {
-        _compute_boards_current( $chains, $category );
-        _compute_boards_alltime( $chains, $category );
-        _compute_boards_yearly( $chains, $category );
+        _compute_boards_current( $chains, $class->board_name, $category );
+        _compute_boards_alltime( $chains, $class->board_name, $category );
+        _compute_boards_yearly( $chains, $class->board_name, $category );
     }
 }
 
