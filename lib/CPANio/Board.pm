@@ -4,10 +4,19 @@ use strict;
 use warnings;
 use CPANio;
 
+# VIRTUAL METHODS
+
 sub board_name {
     my ($class) = @_;
     die "board_name not defined for $class";
 }
+
+sub update {
+    my ($class) = @_;
+    die "update not defined for $class";
+}
+
+# METHODS
 
 sub latest_update {
     my ($class) = @_;
