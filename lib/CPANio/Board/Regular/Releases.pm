@@ -60,3 +60,31 @@ sub resultclass_name { 'ReleaseBins' }
 sub periods {qw( month week day )}
 
 1;
+
+__END__
+
+=head1 NAME
+
+CPANio::Board::Regular::Releases - Compute the board for regular releases
+
+=head1 SYNPOPSIS
+
+    use CPANio::Board::Regular::Releases;
+
+    CPANio::Board::Regular::Releases->update;
+
+=head1 DESCRIPTION
+
+This board computes the chains for "regular releases", i.e. authors who
+publish a new CPAN release at least once every period.
+
+=head2 Periods
+
+This board is computed for every month, week and day.
+
+=head1 AUTHOR
+
+Philippe Bruhat (BOOK), based on the work of Christopher J. Madsen (CJM)
+and Neil Bowers (NEILB).
+
+=cut
