@@ -13,7 +13,7 @@ sub update_author_bins {
     my ( $class, $since ) = @_;
     my %bins;
     my $latest_release;
-    my $releases = __PACKAGE__->get_releases;
+    my $releases = $class->get_releases;
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;
