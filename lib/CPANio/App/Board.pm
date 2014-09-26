@@ -111,7 +111,7 @@ sub dispatch_request {
             period   => $period,
             contests => \@contests,
         };
-        $tt->process( 'board/once_a/category_index', $vars, \my $output )
+        $tt->process( 'board/once_a/game_index', $vars, \my $output )
             or die $tt->error();
 
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
