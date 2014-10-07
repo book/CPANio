@@ -1,9 +1,3 @@
-[% IF limit %]
-<p>
-The tables below list the top participants up to rank [% limit %].
-</p>
-[% END %]
-
 <table width="100%" align="center">
     <tr valign=top>
         [% FOREACH board IN boards %]
