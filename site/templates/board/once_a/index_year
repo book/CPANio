@@ -3,4 +3,7 @@
 Release something to CPAN each [% period %] for a year.
 How many [% period %]s can you keep that up?
 </p>
-[% board/once_a/board_list %]
+<p>
+The tables below list the top participants up to rank [% limit %].
+</p>
+[% PROCESS board/once_a/board_list %]
