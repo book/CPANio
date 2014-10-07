@@ -1,45 +1,39 @@
-package CPANio::Board::OnceA;
+package CPANio::Game::Regular;
 
 use 5.010;
 use strict;
 use warnings;
 
 use CPANio;
-use CPANio::Board;
-our @ISA = qw( CPANio::Board );
+use CPANio::Game;
+our @ISA = qw( CPANio::Game );
+
+use CPANio::Bins;
 
 # CONSTANTS
-my @CATEGORIES = qw( month week day );
 my %LIKE = (
     month => 'M%',
     week  => 'W%',
     day   => 'D%',
 );
 
-# PRIVATE FUNCTIONS
-sub _get_bins_for {
-    my ($category) = @_;
-    state %bins;
-
-    return $bins{$category} ||= [
-        $CPANio::schema->resultset('ReleaseBins')->search(
-            {   author => '',
-                bin    => { like => $LIKE{$category} },
-            },
-            { order_by => { -desc => 'bin' } }
-        )->get_column('bin')->all
-    ];
+sub resultclass_name {
+    my ($class) = @_;
+    die "resultclass_name not defined for $class";
 }
 
-sub _find_authors_chains {
+# PRIVATE FUNCTIONS
+
+sub _authors_chains {
+    my ( $resultclass_name, @categories ) = @_;
     my $schema  = $CPANio::schema;
-    my $bins_rs = $schema->resultset('ReleaseBins');
+    my $bins_rs = $schema->resultset($resultclass_name);
 
     my %chains;
-    for my $category (@CATEGORIES) {
+    for my $category (@categories) {
 
         # pick the bins for the current category
-        my @bins = @{ _get_bins_for($category) };
+        my $bins = CPANio::Bins->bins_since()->{$category};
 
         # get the list of bins for all the authors
         my %bins;
@@ -57,9 +51,9 @@ sub _find_authors_chains {
 
             # split the bins into chains
             while (@$Bins) {
-                $i++ while $Bins->[0] ne $bins[$i];
+                $i++ while $Bins->[0] ne $bins->[$i];
                 my $j = 0;
-                while ( $Bins->[$j] eq $bins[$i] ) {
+                while ( $Bins->[$j] eq $bins->[$i] ) {
                     $i++;
                     $j++;
                     last if $j >= @$Bins;
@@ -96,10 +90,10 @@ sub _commit_entries {
 }
 
 sub _compute_boards_current {
-    my ( $chains, $category ) = @_;
+    my ( $chains, $game, $category ) = @_;
 
     # pick the bins for the current category
-    my $bins = _get_bins_for($category);
+    my $bins = CPANio::Bins->bins_since()->{$category};
 
     # only keep the active chains
     my @entries;
@@ -110,6 +104,7 @@ sub _compute_boards_current {
             || $chain->[0] eq $bins->[2] )
         {
             push @entries, {
+                game    => $game,
                 contest => 'current',
                 author  => $author,
                 count   => scalar @$chain,
@@ -129,16 +124,17 @@ sub _compute_boards_current {
 }
 
 sub _compute_boards_alltime {
-    my ( $chains, $category ) = @_;
+    my ( $chains, $game, $category ) = @_;
 
     # pick the bins for the current category
-    my $bins = _get_bins_for($category);
+    my $bins = CPANio::Bins->bins_since()->{$category};
 
     my @entries = map {
         my $author = $_;
         my @chains = @{ $chains->{$category}{$author} };
         my $chain  = shift @chains;                  # possibly active
-        {   contest => 'all-time',
+        {   game    => $game,
+            contest => 'all-time',
             author  => $author,
             count   => scalar @$chain,
             safe    => 0 + ( $chain->[0] eq $bins->[0] ),
@@ -146,6 +142,7 @@ sub _compute_boards_alltime {
             fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
         },
             map +{
+            game    => $game,
             contest => 'all-time',
             author  => $author,
             count   => scalar @$_,
@@ -166,11 +163,11 @@ sub _compute_boards_alltime {
 }
 
 sub _compute_boards_yearly {
-    my ( $chains, $category ) = @_;
+    my ( $chains, $game, $category ) = @_;
     my @years = ( 1995 .. 1900 + (gmtime)[5] );
 
     # pick the bins for the current category
-    my $bins = _get_bins_for($category);
+    my $bins = CPANio::Bins->bins_since()->{$category};
 
     for my $year (@years) {
         my @entries = map {
@@ -180,7 +177,8 @@ sub _compute_boards_yearly {
             @chains
                 ? do {
                 my $chain = shift @chains;    # possibly active
-                {   contest => $year,
+                {   game    => $game,
+                    contest => $year,
                     author  => $author,
                     count   => scalar @$chain,
                     safe    => 0 + ( $chain->[0] eq $bins->[0] ),
@@ -188,6 +186,7 @@ sub _compute_boards_yearly {
                     fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
                 },
                     map +{
+                    game    => $game,
                     contest => $year,
                     author  => $author,
                     count   => scalar @$_,
@@ -211,27 +210,61 @@ sub _compute_boards_yearly {
     }
 }
 
-# CLASS METHODS
-sub board_name { 'once-a' }
+# VIRTUAL METHODS
 
-sub update {
-    my $since = __PACKAGE__->latest_update;
-
-    # we depend on the bins
-    require CPANio::Board::Bins;
-    return if $since > CPANio::Board::Bins->latest_update;
-
-    # pick up all the chains
-    my $chains = _find_authors_chains();
-
-    # compute all contests
-    for my $category (@CATEGORIES) {
-        _compute_boards_current( $chains, $category );
-        _compute_boards_alltime( $chains, $category );
-        _compute_boards_yearly( $chains, $category );
-    }
-
-    __PACKAGE__->update_done();
+sub update_author_bins {
+    my ($class) = @_;
+    die "update_author_bins not defined for $class";
 }
 
+sub periods {
+    my ($class) = @_;
+    die "periods not defined for $class";
+}
+
+# CLASS METHODS
+
+sub latest_bins_update {
+    my $class = shift;
+    my $bin = $CPANio::schema->resultset( $class->resultclass_name )
+        ->search( { bin => { like => 'D%' } } )->get_column('bin')->max;
+    return $bin
+        ? CPANio::Bins->bin_to_epoch($bin)
+        : $CPANio::Bins::FIRST_RELEASE_TIME;
+}
+
+sub get_releases {
+    my $class = shift;
+
+    my $backpan = BackPAN::Index->new(
+        cache_ttl => 3600,    # 1 hour
+        backpan_index_url =>
+            "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
+    );
+
+    return BackPAN::Index->new->releases->search(
+        { date     => { '>', $class->latest_bins_update } },
+        { order_by => 'date' } );
+}
+
+sub update_boards {
+    my ( $class, @categories ) = @_;
+
+    # pick up all the chains
+    my $chains = _authors_chains( $class->resultclass_name, @categories );
+
+    # compute all contests
+    for my $category (@categories) {
+        _compute_boards_current( $chains, $class->game_name, $category );
+        _compute_boards_alltime( $chains, $class->game_name, $category );
+        _compute_boards_yearly( $chains, $class->game_name, $category );
+    }
+}
+
+sub update {
+    my ($class) = @_;
+    $class->update_author_bins();
+    $class->update_boards( $class->periods );
+    $class->update_done();
+}
 1;

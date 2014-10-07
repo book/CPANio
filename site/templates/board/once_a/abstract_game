@@ -1,0 +1,14 @@
+<p>
+Release
+[% SWITCH game -%]
+[% CASE 'releases' %]something
+[% CASE 'distributions' %]a new (for you) distribution
+[% CASE 'new-distributions' %]a new distribution
+[% END %]
+to CPAN each [% period %]. How many [% period %]s can
+you keep that up? Timings are in 'PAUSE time', which is GMT. The time
+for your upload is the timestamp that PAUSE puts on your upload when it
+goes into CPAN (which you can see on BackPAN). This is very close to the
+'Request completed' timestamp, in the first email you get from PAUSE
+when you upload something.
+</p>

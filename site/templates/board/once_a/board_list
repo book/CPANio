@@ -1,0 +1,15 @@
+<table width="100%" align="center">
+    <tr valign=top>
+        [% FOREACH board IN boards %]
+            <td align=center>
+            [% PROCESS board/once_a/leaderboard
+               title    = board.title
+               entries  = board.entries
+               url      = board.url
+               previous = board.previous
+               next     = board.next
+            %]
+            </td>
+        [% END %]
+    </tr>
+</table>

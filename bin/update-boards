@@ -15,9 +15,10 @@ BEGIN {
 
 use CPANio;
 
-my @boards = qw( Bins OnceA );
+my @games = qw( Regular::Releases );
 
-for my $board ( @boards ) {
-    require "CPANio/Board/$board.pm";
-    "CPANio::Board::$board"->update;
+for my $game (@games) {
+    ( my $file = $game ) =~ s{::}{/}g;
+    require "CPANio/Game/$file.pm";
+    "CPANio::Game::$game"->update;
 }
