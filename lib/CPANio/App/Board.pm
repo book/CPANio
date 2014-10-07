@@ -71,10 +71,11 @@ sub dispatch_request {
             limit => 10,
         };
 
-        $tt->process( 'board/once_a/period_index', $vars, \my $output )
+        $tt->process( 'board/once_a/index_period', $vars, \my $output )
             or die $tt->error();
 
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
+
     },
 
     sub (/once-a/*/*/) {
