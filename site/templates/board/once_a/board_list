@@ -5,7 +5,6 @@
             [% PROCESS board/once_a/leaderboard
                title    = board.title
                entries  = board.entries
-               limit    = limit
                url      = board.url
                previous = board.previous
                next     = board.next
