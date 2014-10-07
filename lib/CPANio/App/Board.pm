@@ -37,7 +37,7 @@ sub dispatch_request {
             limit => 10,
         };
 
-        $tt->process( 'board/once_a/main_index', $vars, \my $output )
+        $tt->process( 'board/once_a/index_main', $vars, \my $output )
             or die $tt->error();
 
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
