@@ -1,4 +1,4 @@
-<h1>CPAN regular releasers boards</h1>
+<h1>CPAN once-a [% period %] boards</h1>
 
 [% PROCESS board/once_a/abstract_game %]
 [% PROCESS board/once_a/abstract_period %]
