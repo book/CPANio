@@ -147,7 +147,7 @@ sub dispatch_request {
             year     => $year,
         };
 
-        $tt->process( 'board/once_a/year_index', $vars, \my $output )
+        $tt->process( 'board/once_a/index_year', $vars, \my $output )
             or die $tt->error();
 
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];

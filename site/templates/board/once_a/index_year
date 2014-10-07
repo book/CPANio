@@ -1,0 +1,6 @@
+<h1>CPAN once-a-[% period %] [% game %] for [% year %]</h1>
+<p>
+Release something to CPAN each [% period %] for a year.
+How many [% period %]s can you keep that up?
+</p>
+[% board/once_a/board_list %]
