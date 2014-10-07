@@ -1,9 +1,9 @@
 <h1>CPAN regular releasers boards</h1>
 
+[% PROCESS board/once_a/abstract_game %]
+[% PROCESS board/once_a/abstract_period %]
 <p>
 The tables below list the top [% limit %] participants in the "current" contest
 (all chains still under construction).
 </p>
-
-[% PROCESS board/once_a/abstract_period %]
 [% PROCESS board/once_a/board_list %]
