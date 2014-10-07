@@ -24,4 +24,7 @@ recorded by PAUSE, with no exceptions.</p>
 
 [% PROCESS board/once_a/abstract_game %]
 [% PROCESS board/once_a/abstract_period %]
+<p>
+The tables below list the top participants up to rank [% limit %].
+</p>
 [% PROCESS board/once_a/board_list %]
