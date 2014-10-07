@@ -12,7 +12,7 @@ sub dispatch_request {
     my $order_by
         = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
 
-    my @games = qw( Releases );
+    my @games = qw( Releases Distributions );
     require "CPANio/Game/Regular/$_.pm" for @games;
     my @classes = map "CPANio::Game::Regular::$_", @games;
     my %game_class = ( map +( $_->game_name => $_ ), @classes );
@@ -28,7 +28,7 @@ sub dispatch_request {
                     map +{
                         entries =>
                             scalar $schema->resultset("OnceA\u$_")->search(
-                            { contest  => 'current' },
+                            { game => $game, contest => 'current' },
                             { order_by => [ 'rank', 'author' ] }
                             ),
                         title => "once a $_ $game",
