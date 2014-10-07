@@ -12,7 +12,8 @@ At around the same time, <a href="https://metacpan.org/author/CJM" class="cpanAu
 a board following Mark's rules on <a href="http://onceaweek.cjmweb.net/">http://onceaweek.cjmweb.net/</a>.</p>
 
 <p>In February 2014, <a href="https://metacpan.org/author/NEILB" class="cpanAuthor">NEILB</a> extended the game to include leaderboards
-for monthly and daily release schedules.
+for <a href="../../month/releases/">monthly</a> and <a href="../../day/releases/">daily</a> release schedules
+in addition to the <a href="../../week/releases/">weekly</a> one.
 Titled the <a href="http://neilb.org/cpan-regulars/">CPAN Regulars Releasers</a>,
 his version of the game has stricter rules, using the timestamp as
 recorded by PAUSE, with no exceptions.</p>
