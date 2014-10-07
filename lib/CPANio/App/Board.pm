@@ -68,7 +68,8 @@ sub dispatch_request {
                 },
                 @{ $games{$period} }
             ],
-            limit => 10,
+            limit  => 10,
+            period => $period,
         };
 
         $tt->process( 'board/once_a/index_period', $vars, \my $output )
@@ -145,6 +146,7 @@ sub dispatch_request {
             ],
             limit    => 200,
             period   => $period,
+            game     => $game,
             contests => [$year],
             year     => $year,
         };
