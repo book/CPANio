@@ -12,7 +12,7 @@ sub dispatch_request {
     my $order_by
         = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
 
-    my @games = qw( Releases );
+    my @games = qw( Releases Distributions );
     require "CPANio/Game/Regular/$_.pm" for @games;
     my @classes = map "CPANio::Game::Regular::$_", @games;
     my %game_class = ( map +( $_->game_name => $_ ), @classes );
@@ -28,11 +28,12 @@ sub dispatch_request {
                     map +{
                         entries =>
                             scalar $schema->resultset("OnceA\u$_")->search(
-                            { contest  => 'current' },
+                            { game => $game, contest => 'current' },
                             { order_by => [ 'rank', 'author' ] }
                             ),
                         title => "once a $_ $game",
                         url   => "$_/$game/",
+                        game  => $game,
                         },
                         $_->periods
                     } @classes
@@ -66,7 +67,8 @@ sub dispatch_request {
                         { game     => $_,       contest => 'current', },
                         { order_by => [ 'rank', 'author' ] }
                         ),
-                    title => "once a $period",
+                    title => $_,
+                    game  => $_,
                     url   => "$_/",
                 },
                 @{ $games{$period} }
@@ -104,10 +106,11 @@ sub dispatch_request {
                     {   entries =>
                             scalar $schema->resultset("OnceA\u$period")
                             ->search(
-                            { contest  => $_ },
+                            { game => $game, contest  => $_ },
                             { order_by => [ 'rank', 'author' ] }
                             ),
                         title => $_,
+                        game  => $game,
                         @yearly,
                     }
                 } @contests
@@ -138,10 +141,11 @@ sub dispatch_request {
                 map +{
                     entries =>
                         scalar $schema->resultset("OnceA\u$period")->search(
-                        { contest  => $_ },
+                        { game => $game, contest  => $_ },
                         { order_by => [ 'rank', 'author' ] }
                         ),
                     title => $_,
+                    game  => $game,
                   ( previous => $_ - 1 )x!! ( $_ > 1995 ),
                   ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
                 },
