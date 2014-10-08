@@ -104,7 +104,7 @@ sub dispatch_request {
                     {   entries =>
                             scalar $schema->resultset("OnceA\u$period")
                             ->search(
-                            { contest  => $_ },
+                            { game => $game, contest  => $_ },
                             { order_by => [ 'rank', 'author' ] }
                             ),
                         title => $_,
@@ -138,7 +138,7 @@ sub dispatch_request {
                 map +{
                     entries =>
                         scalar $schema->resultset("OnceA\u$period")->search(
-                        { contest  => $_ },
+                        { game => $game, contest  => $_ },
                         { order_by => [ 'rank', 'author' ] }
                         ),
                     title => $_,
