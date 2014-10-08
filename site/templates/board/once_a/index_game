@@ -23,7 +23,7 @@ recorded by PAUSE, with no exceptions.</p>
 [% CASE 'distributions' %]
 
 <p>On December 8, 2013, <a href="https://metacpan.org/author/NEILB" class="cpanAuthor">NEILB</a>
-create a stencil on <a href="http://questhub.io/">Questhub.io</a> opening
+created a stencil on <a href="http://questhub.io/">Questhub.io</a> opening
 the <a href="https://questhub.io/realm/perl/stencil/52a3c31b9f567ac04000008f">Monthly New Distribution Challenge 2014</a>.
 The challenge for authors was to release each month a distribution they have
 never released before (either an entirely new distribution, an adopted or
