@@ -66,7 +66,7 @@ sub dispatch_request {
                         { game     => $_,       contest => 'current', },
                         { order_by => [ 'rank', 'author' ] }
                         ),
-                    title => "once a $period",
+                    title => $_,
                     url   => "$_/",
                 },
                 @{ $games{$period} }
