@@ -59,7 +59,7 @@ sub game_name { 'distributions' }
 
 sub resultclass_name { 'DistributionBins' }
 
-sub periods {qw( month )}
+sub periods {qw( month week )}
 
 1;
 
@@ -83,7 +83,7 @@ who publish a new CPAN distribution (for them) at least once every period.
 =head2 Periods
 
 The boards for this game are computed for the following periods:
-month.
+month and week.
 
 =head1 AUTHOR
 
