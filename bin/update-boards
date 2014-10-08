@@ -15,7 +15,7 @@ BEGIN {
 
 use CPANio;
 
-my @games = qw( Regular::Releases );
+my @games = qw( Regular::Releases Regular::Distributions );
 
 for my $game (@games) {
     ( my $file = $game ) =~ s{::}{/}g;

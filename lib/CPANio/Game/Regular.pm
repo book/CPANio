@@ -25,21 +25,21 @@ sub resultclass_name {
 # PRIVATE FUNCTIONS
 
 sub _authors_chains {
-    my ( $resultclass_name, @categories ) = @_;
+    my ( $resultclass_name, @periods ) = @_;
     my $schema  = $CPANio::schema;
     my $bins_rs = $schema->resultset($resultclass_name);
 
     my %chains;
-    for my $category (@categories) {
+    for my $period (@periods) {
 
-        # pick the bins for the current category
-        my $bins = CPANio::Bins->bins_since()->{$category};
+        # pick the bins for the current period
+        my $bins = CPANio::Bins->bins_since()->{$period};
 
         # get the list of bins for all the authors
         my %bins;
         push @{ $bins{ $_->author } }, $_->bin
             for $bins_rs->search(
-            { author => { '!=' => '' }, bin => { like => $LIKE{$category} } },
+            { author => { '!=' => '' }, bin => { like => $LIKE{$period} } },
             { order_by => { -desc => 'bin' } }
             );
 
@@ -63,14 +63,14 @@ sub _authors_chains {
             }
             $bins{$author} = \@chains if @chains;
         }
-        $chains{$category} = \%bins;
+        $chains{$period} = \%bins;
     }
 
     return \%chains;
 }
 
 sub _commit_entries {
-    my ( $category, $contest, $entries ) = @_;
+    my ( $period, $game, $contest, $entries ) = @_;
 
     # compute rank
     my $Rank = my $rank = my $prev = 0;
@@ -84,21 +84,21 @@ sub _commit_entries {
     }
 
     # update database
-    my $rs = $CPANio::schema->resultset("OnceA\u$category");
-    $rs->search( { contest => $contest } )->delete();
+    my $rs = $CPANio::schema->resultset("OnceA\u$period");
+    $rs->search( { game => $game, contest => $contest } )->delete();
     $rs->populate($entries);
 }
 
 sub _compute_boards_current {
-    my ( $chains, $game, $category ) = @_;
+    my ( $chains, $game, $period ) = @_;
 
-    # pick the bins for the current category
-    my $bins = CPANio::Bins->bins_since()->{$category};
+    # pick the bins for the current period
+    my $bins = CPANio::Bins->bins_since()->{$period};
 
     # only keep the active chains
     my @entries;
-    for my $author ( keys %{ $chains->{$category} } ) {
-        my $chain = $chains->{$category}{$author}[0];    # current chain only
+    for my $author ( keys %{ $chains->{$period} } ) {
+        my $chain = $chains->{$period}{$author}[0];    # current chain only
         if (   $chain->[0] eq $bins->[0]
             || $chain->[0] eq $bins->[1]
             || $chain->[0] eq $bins->[2] )
@@ -120,18 +120,18 @@ sub _compute_boards_current {
         grep $_->{count} >= 2,
         @entries;
 
-    _commit_entries( $category, 'current', \@entries );
+    _commit_entries( $period, $game, 'current', \@entries );
 }
 
 sub _compute_boards_alltime {
-    my ( $chains, $game, $category ) = @_;
+    my ( $chains, $game, $period ) = @_;
 
-    # pick the bins for the current category
-    my $bins = CPANio::Bins->bins_since()->{$category};
+    # pick the bins for the current period
+    my $bins = CPANio::Bins->bins_since()->{$period};
 
     my @entries = map {
         my $author = $_;
-        my @chains = @{ $chains->{$category}{$author} };
+        my @chains = @{ $chains->{$period}{$author} };
         my $chain  = shift @chains;                  # possibly active
         {   game    => $game,
             contest => 'all-time',
@@ -150,7 +150,7 @@ sub _compute_boards_alltime {
             active  => 0,
             fallen  => 0,
             }, @chains;
-    } keys %{ $chains->{$category} };
+    } keys %{ $chains->{$period} };
 
     # sort chains, and keep only one per author
     my %seen;
@@ -159,21 +159,21 @@ sub _compute_boards_alltime {
         grep $_->{count} >= 2,
         @entries;
 
-    _commit_entries( $category, 'all-time', \@entries );
+    _commit_entries( $period, $game, 'all-time', \@entries );
 }
 
 sub _compute_boards_yearly {
-    my ( $chains, $game, $category ) = @_;
+    my ( $chains, $game, $period ) = @_;
     my @years = ( 1995 .. 1900 + (gmtime)[5] );
 
-    # pick the bins for the current category
-    my $bins = CPANio::Bins->bins_since()->{$category};
+    # pick the bins for the current period
+    my $bins = CPANio::Bins->bins_since()->{$period};
 
     for my $year (@years) {
         my @entries = map {
             my $author = $_;   # keep the sub-chains that occured during $year
             my @chains = grep @$_, map [ grep /^\w$year\b/, @$_ ],
-                @{ $chains->{$category}{$author} };
+                @{ $chains->{$period}{$author} };
             @chains
                 ? do {
                 my $chain = shift @chains;    # possibly active
@@ -197,7 +197,7 @@ sub _compute_boards_yearly {
                     @chains;
                 }
                 : ();
-        } keys %{ $chains->{$category} };
+        } keys %{ $chains->{$period} };
 
         # sort chains, and keep only one per author
         my %seen;
@@ -206,7 +206,7 @@ sub _compute_boards_yearly {
             grep $_->{count} >= 2,
             @entries;
 
-        _commit_entries( $category, $year, \@entries );
+        _commit_entries( $period, $game, $year, \@entries );
     }
 }
 
@@ -248,16 +248,16 @@ sub get_releases {
 }
 
 sub update_boards {
-    my ( $class, @categories ) = @_;
+    my ( $class, @periods ) = @_;
 
     # pick up all the chains
-    my $chains = _authors_chains( $class->resultclass_name, @categories );
+    my $chains = _authors_chains( $class->resultclass_name, @periods );
 
     # compute all contests
-    for my $category (@categories) {
-        _compute_boards_current( $chains, $class->game_name, $category );
-        _compute_boards_alltime( $chains, $class->game_name, $category );
-        _compute_boards_yearly( $chains, $class->game_name, $category );
+    for my $period (@periods) {
+        _compute_boards_current( $chains, $class->game_name, $period );
+        _compute_boards_alltime( $chains, $class->game_name, $period );
+        _compute_boards_yearly( $chains, $class->game_name, $period );
     }
 }
 

@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use FindBin;
 use Path::Class;
+use Getopt::Long;
 
 BEGIN {
     unshift @INC, dir($FindBin::Bin)->parent->subdir('lib')->stringify;
@@ -10,4 +11,14 @@ BEGIN {
 
 use CPANio;
 
-$CPANio::schema->deploy( { add_drop_table => 1, quote_identifiers => 1 } );
+GetOptions( \my %option, 'dry_run|dry-run' )
+    or die "Usage: $0 [ --dry-run ]\n";
+
+if ( $option{dry_run} ) {
+    print map "$_\n", $CPANio::schema->deployment_statements( '','','',
+        { add_drop_table => 1, quote_identifiers => 1 } );
+}
+else {
+    $CPANio::schema->deploy(
+        { add_drop_table => 1, quote_identifiers => 1 } );
+}
