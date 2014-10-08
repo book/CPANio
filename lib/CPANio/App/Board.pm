@@ -12,7 +12,7 @@ sub dispatch_request {
     my $order_by
         = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
 
-    my @games = qw( Releases Distributions );
+    my @games = qw( Releases Distributions NewDistributions );
     require "CPANio/Game/Regular/$_.pm" for @games;
     my @classes = map "CPANio::Game::Regular::$_", @games;
     my %game_class = ( map +( $_->game_name => $_ ), @classes );
