@@ -70,7 +70,7 @@ sub _authors_chains {
 }
 
 sub _commit_entries {
-    my ( $period, $contest, $entries ) = @_;
+    my ( $period, $game, $contest, $entries ) = @_;
 
     # compute rank
     my $Rank = my $rank = my $prev = 0;
@@ -120,7 +120,7 @@ sub _compute_boards_current {
         grep $_->{count} >= 2,
         @entries;
 
-    _commit_entries( $period, 'current', \@entries );
+    _commit_entries( $period, $game, 'current', \@entries );
 }
 
 sub _compute_boards_alltime {
@@ -159,7 +159,7 @@ sub _compute_boards_alltime {
         grep $_->{count} >= 2,
         @entries;
 
-    _commit_entries( $period, 'all-time', \@entries );
+    _commit_entries( $period, $game, 'all-time', \@entries );
 }
 
 sub _compute_boards_yearly {
@@ -206,7 +206,7 @@ sub _compute_boards_yearly {
             grep $_->{count} >= 2,
             @entries;
 
-        _commit_entries( $period, $year, \@entries );
+        _commit_entries( $period, $game, $year, \@entries );
     }
 }
 
