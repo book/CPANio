@@ -33,6 +33,7 @@ sub dispatch_request {
                             ),
                         title => "once a $_ $game",
                         url   => "$_/$game/",
+                        game  => $game,
                         },
                         $_->periods
                     } @classes
@@ -67,6 +68,7 @@ sub dispatch_request {
                         { order_by => [ 'rank', 'author' ] }
                         ),
                     title => $_,
+                    game  => $_,
                     url   => "$_/",
                 },
                 @{ $games{$period} }
@@ -108,6 +110,7 @@ sub dispatch_request {
                             { order_by => [ 'rank', 'author' ] }
                             ),
                         title => $_,
+                        game  => $game,
                         @yearly,
                     }
                 } @contests
@@ -142,6 +145,7 @@ sub dispatch_request {
                         { order_by => [ 'rank', 'author' ] }
                         ),
                     title => $_,
+                    game  => $game,
                   ( previous => $_ - 1 )x!! ( $_ > 1995 ),
                   ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
                 },
