@@ -247,7 +247,7 @@ sub get_releases {
 
     return $class->backpan->releases->search(
         { date     => { '>', $class->latest_bins_update } },
-        { order_by => 'date' } );
+        { order_by => 'date', prefetch => 'dist' }
 }
 
 sub update_boards {
