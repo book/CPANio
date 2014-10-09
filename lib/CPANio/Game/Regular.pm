@@ -212,9 +212,9 @@ sub _compute_boards_yearly {
 
 # VIRTUAL METHODS
 
-sub update_author_bins {
+sub compute_author_bins {
     my ($class) = @_;
-    die "update_author_bins not defined for $class";
+    die "compute_author_bins not defined for $class";
 }
 
 sub periods {
@@ -233,18 +233,55 @@ sub latest_bins_update {
         : $CPANio::Bins::FIRST_RELEASE_TIME;
 }
 
-sub get_releases {
-    my $class = shift;
-
-    my $backpan = BackPAN::Index->new(
+sub backpan {
+    state $backpan = BackPAN::Index->new(
         cache_ttl => 3600,    # 1 hour
         backpan_index_url =>
             "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
     );
+    return $backpan;
+}
 
-    return BackPAN::Index->new->releases->search(
+sub get_releases {
+    my $class = shift;
+
+    return $class->backpan->releases->search(
         { date     => { '>', $class->latest_bins_update } },
-        { order_by => 'date' } );
+        { order_by => 'date', prefetch => 'dist' }
+    );
+}
+
+sub update_author_bins {
+    my ( $class, $since ) = @_;
+    my ( $bins, $latest_release ) = $class->compute_author_bins($since);
+
+    my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
+    if ( $bins_rs->count ) {    # update
+        for my $bin ( keys %$bins ) {
+            for my $author ( keys %{ $bins->{$bin} } ) {
+                my $row = $bins_rs->find_or_create(
+                    { author => $author, bin => $bin } );
+                $row->count( ( $row->count || 0 ) + $bins->{$bin}{$author} );
+                $row->update;
+            }
+        }
+    }
+    else {                      # create
+        $bins_rs->populate(
+            [   map {
+                    my $bin = $_;
+                    map +{
+                        bin    => $bin,
+                        author => $_,
+                        count  => $bins->{$bin}{$_}
+                        },
+                        keys %{ $bins->{$bin} }
+                    } keys %$bins
+            ]
+        );
+    }
+
+    return $latest_release;
 }
 
 sub update_boards {

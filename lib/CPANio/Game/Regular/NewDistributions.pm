@@ -1,4 +1,4 @@
-package CPANio::Game::Regular::Releases;
+package CPANio::Game::Regular::NewDistributions;
 
 use strict;
 use warnings;
@@ -14,9 +14,11 @@ sub compute_author_bins {
     my %bins;
     my $latest_release;
     my $releases = $class->get_releases;
+    my %seen;
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;
+        next if $seen{ $release->dist }++;
         my $dt = DateTime->from_epoch( epoch => $latest_release );
         my $i;
         $bins{$_}{$author}++
@@ -27,11 +29,11 @@ sub compute_author_bins {
 }
 
 # CLASS METHODS
-sub game_name { 'releases' }
+sub game_name { 'new-distributions' }
 
-sub resultclass_name { 'ReleaseBins' }
+sub resultclass_name { 'NewDistributionBins' }
 
-sub periods {qw( month week day )}
+sub periods {qw( month week )}
 
 1;
 
@@ -39,23 +41,23 @@ __END__
 
 =head1 NAME
 
-CPANio::Game::Regular::Releases - Compute the boards for regular releases
+CPANio::Game::Regular::NewDistributions - Compute the boards for regular distributions
 
 =head1 SYNPOPSIS
 
-    use CPANio::Game::Regular::Releases;
+    use CPANio::Game::Regular::NewDistributions;
 
-    CPANio::Game::Regular::Releases->update;
+    CPANio::Game::Regular::NewDistributions->update;
 
 =head1 DESCRIPTION
 
-This board computes the chains for "regular releases" game, i.e. authors
-who publish a new CPAN release at least once every period.
+This board computes the chains for "regular distributions" game, i.e. authors
+who publish a new CPAN distribution (for CPAN) at least once every period.
 
 =head2 Periods
 
 The boards for this game are computed for the following periods:
-month, week and day.
+month and week.
 
 =head1 AUTHOR
 
