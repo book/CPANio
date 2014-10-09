@@ -233,16 +233,19 @@ sub latest_bins_update {
         : $CPANio::Bins::FIRST_RELEASE_TIME;
 }
 
-sub get_releases {
-    my $class = shift;
-
-    my $backpan = BackPAN::Index->new(
+sub backpan {
+    state $backpan = BackPAN::Index->new(
         cache_ttl => 3600,    # 1 hour
         backpan_index_url =>
             "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
     );
+    return $backpan;
+}
 
-    return $backpan->releases->search(
+sub get_releases {
+    my $class = shift;
+
+    return $class->backpan->releases->search(
         { date     => { '>', $class->latest_bins_update } },
         { order_by => 'date' } );
 }
