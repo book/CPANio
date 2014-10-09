@@ -9,7 +9,7 @@ our @ISA = qw( CPANio::Game::Regular );
 
 # PRIVATE FUNCTIONS
 
-sub update_author_bins {
+sub compute_author_bins {
     my ( $class, $since ) = @_;
     my %bins;
     my $latest_release;
@@ -23,33 +23,7 @@ sub update_author_bins {
             for grep $i++ % 2, CPANio::Bins->datetime_to_bins($dt);
     }
 
-    my $bins_rs = $CPANio::schema->resultset('ReleaseBins');
-    if ( $bins_rs->count ) {    # update
-        for my $bin ( keys %bins ) {
-            for my $author ( keys %{ $bins{$bin} } ) {
-                my $row = $bins_rs->find_or_create(
-                    { author => $author, bin => $bin } );
-                $row->count( ( $row->count || 0 ) + $bins{$bin}{$author} );
-                $row->update;
-            }
-        }
-    }
-    else {                      # create
-        $bins_rs->populate(
-            [   map {
-                    my $bin = $_;
-                    map +{
-                        bin    => $bin,
-                        author => $_,
-                        count  => $bins{$bin}{$_}
-                        },
-                        keys %{ $bins{$bin} }
-                    } keys %bins
-            ]
-        );
-    }
-
-    return $latest_release;
+    return ( \%bins, $latest_release );
 }
 
 # CLASS METHODS
