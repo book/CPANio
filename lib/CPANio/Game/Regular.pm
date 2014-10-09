@@ -242,7 +242,7 @@ sub get_releases {
             "http://backpan.cpantesters.org/backpan-full-index.txt.gz",
     );
 
-    return BackPAN::Index->new->releases->search(
+    return $backpan->releases->search(
         { date     => { '>', $class->latest_bins_update } },
         { order_by => 'date' } );
 }
