@@ -12,13 +12,21 @@ our @ISA = qw( CPANio::Game::Regular );
 sub compute_author_bins {
     my ( $class, $since ) = @_;
     my %bins;
+    my %date;
+    $date{ $_->cpanid }{ $_->dist } = $_->date
+        for $class->backpan->releases->search(
+        {},
+        {   columns  => [ 'cpanid', 'dist', { date => \'min(date)' } ],
+            prefetch => 'dist',
+            group_by => [ 'cpanid', 'dist' ]
+        }
+        )->all;
     my $latest_release;
     my $releases = $class->get_releases;
-    my %seen;
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;
-        next if $seen{$author}{ $release->dist }++;
+        next if $date{$author}{ $release->dist } ne $latest_release;
         my $dt = DateTime->from_epoch( epoch => $latest_release );
         my $i;
         $bins{$_}{$author}++
