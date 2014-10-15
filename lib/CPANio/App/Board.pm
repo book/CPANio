@@ -29,7 +29,7 @@ sub dispatch_request {
                         entries =>
                             scalar $schema->resultset("OnceA\u$_")->search(
                             { game => $game, contest => 'current' },
-                            { order_by => [ 'rank', 'author' ] }
+                            { order_by => $order_by }
                             ),
                         title => "once a $_ $game",
                         url   => "$_/$game/",
@@ -65,7 +65,7 @@ sub dispatch_request {
                     entries =>
                         scalar $schema->resultset("OnceA\u$period")->search(
                         { game     => $_,       contest => 'current', },
-                        { order_by => [ 'rank', 'author' ] }
+                        { order_by => $order_by }
                         ),
                     title => $_,
                     game  => $_,
@@ -107,7 +107,7 @@ sub dispatch_request {
                             scalar $schema->resultset("OnceA\u$period")
                             ->search(
                             { game => $game, contest  => $_ },
-                            { order_by => [ 'rank', 'author' ] }
+                            { order_by => $order_by }
                             ),
                         title => $_,
                         game  => $game,
@@ -142,7 +142,7 @@ sub dispatch_request {
                     entries =>
                         scalar $schema->resultset("OnceA\u$period")->search(
                         { game => $game, contest  => $_ },
-                        { order_by => [ 'rank', 'author' ] }
+                        { order_by => $order_by }
                         ),
                     title => $_,
                     game  => $game,
