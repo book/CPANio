@@ -18,7 +18,7 @@ sub compute_author_bins {
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;
-        next if $seen{ $release->dist }++;
+        next if $release->dist->first_date ne $latest_release;
         my $dt = DateTime->from_epoch( epoch => $latest_release );
         my $i;
         $bins{$_}{$author}++
