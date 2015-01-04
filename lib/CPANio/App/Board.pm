@@ -17,11 +17,17 @@ sub dispatch_request {
     my @classes = map "CPANio::Game::Regular::$_", @games;
     my %game_class = ( map +( $_->game_name => $_ ), @classes );
 
+    # get the date of the latest release considered
+    my $latest_release =
+      $self->config->{schema}->resultset('Timestamps')
+      ->find( { game => 'backpan-release' } )->latest_update;
+
     # show every current competition
     sub (/once-a/) {
         my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
+            latest => $latest_release,
             boards => [
                 map {
                     my $game = $_->game_name;
@@ -60,6 +66,7 @@ sub dispatch_request {
         my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
+            latest => $latest_release,
             boards => [
                 map +{
                     entries =>
@@ -96,6 +103,7 @@ sub dispatch_request {
         my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
+            latest => $latest_release,
             boards => [
                 map {
                     my @yearly = /^[0-9]+$/ ? (
@@ -137,6 +145,7 @@ sub dispatch_request {
         my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
+            latest => $latest_release,
             boards => [
                 map +{
                     entries =>
