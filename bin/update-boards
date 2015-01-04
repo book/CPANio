@@ -26,3 +26,12 @@ for my $game (@games) {
     require "CPANio/Game/$file.pm";
     "CPANio::Game::$game"->update;
 }
+
+# compute the date of the latest release considered
+my $latest_release =
+  CPANio::Game::Regular->backpan->releases->find( {},
+    { order_by => { -desc => 'date' }, rows => 1 } )->date;
+
+$CPANio::schema->resultset('Timestamps')
+  ->update_or_create(
+    { game => 'backpan-release', latest_update => $latest_release } );
