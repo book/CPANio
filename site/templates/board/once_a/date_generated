@@ -1,7 +1,7 @@
 [% USE date %]
 <p><small>
-Page generated on [% date.format( date.now, '%Y-%m-%d at %H:%M' ) %],
-based on all CPAN distributions released until [% date.format( latest, '%Y-%m-%d at %H:%M' ) %].
+Page generated on [% date.format( date.now, format => '%Y-%m-%d at %H:%M', gmt => 1 ) %] UTC,
+based on all CPAN distributions released until [% date.format( latest, format => '%Y-%m-%d at %H:%M', gmt => 1 ) %] UTC.
 Data from the <a href="http://www.cpantesters.org/">CPAN Testers</a>
 <a href="http://backpan.cpantesters.org/">BackPAN indexes</a>.
 </small></p>
