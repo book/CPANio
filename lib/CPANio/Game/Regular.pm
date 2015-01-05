@@ -3,6 +3,7 @@ package CPANio::Game::Regular;
 use 5.010;
 use strict;
 use warnings;
+use BackPAN::Index;
 
 use CPANio;
 use CPANio::Game;
@@ -304,4 +305,5 @@ sub update {
     $class->update_boards( $class->periods );
     $class->update_done();
 }
+
 1;
