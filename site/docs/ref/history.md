@@ -50,7 +50,7 @@ libwww-perl library for perl4 that Roy maintained
 Perl version 1 included tests that were based on what became the
 test anything protocol (TAP):
 printing "ok #" or "not ok #" to STDOUT.
-Up to Perl 5, tests just effectively did <tt><b>print ok 1\n"</b></tt>.
+Up to Perl 5, tests just effectively did <tt><b>print "ok 1\n"</b></tt>.
 
 The USENET group comp.lang.perl is where most public perl discussion happened
 at this time,
