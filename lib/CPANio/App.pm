@@ -17,7 +17,7 @@ has handler => (
 # default configuration
 sub default_config {
     (   ui       => \"<html><body>\n[% content %]\n</body></html>",
-        base_dir => dir(),
+        base_dir => CPANio->base_dir->subdir('site'),
     );
 }
 
@@ -33,19 +33,17 @@ sub BUILD {
     $config->{template} //= Template->new(
         INCLUDE_PATH => $config->{templates_dir},
     );
-
-    $config->{schema} //= $CPANio::schema;
-
 }
 
 # automatically load, configure and cache a sub-application handler
 sub handler_for {
-    my ( $self, $category, $extra ) = @_;
-    return $self->handler->{$category} ||= do {
-        require "CPANio/App/\u$category.pm";
+    my ( $self, $module, $extra ) = @_;
+    return $self->handler->{$module} ||= do {
+        require "CPANio/App/$module.pm";
         my $config = { %{ $self->config } };
         @{$config}{ keys %$extra } = values %$extra if $extra;
-        "CPANio::App::\u$category"->new( config => $config )->to_psgi_app;
+        my $class = join '::', split '/', "CPANio/App/$module";
+        $class->new( config => $config )->to_psgi_app;
     };
 }
 
@@ -93,15 +91,15 @@ sub dispatch_request {
         },
 
         # other handlers
-        sub (/board/...) {
+        sub (/board/once-a/...) {
             my ( $self, $env ) = @_;
-            $self->handler_for('board')->($env);
+            $self->handler_for('Board/Regular')->($env);
         },
 
         # assume the requested page is a "document"
         sub (/...) {
             my ( $self, $env ) = @_;
-            $self->handler_for('document')->($env);
+            $self->handler_for('Document')->($env);
         },
 
         # not found

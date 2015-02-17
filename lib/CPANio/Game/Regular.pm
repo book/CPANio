@@ -177,14 +177,15 @@ sub _compute_boards_yearly {
                 @{ $chains->{$period}{$author} };
             @chains
                 ? do {
+                my $active = $bins->[0] =~ /^\w$year\b/;
                 my $chain = shift @chains;    # possibly active
                 {   game    => $game,
                     contest => $year,
                     author  => $author,
                     count   => scalar @$chain,
-                    safe    => 0 + ( $chain->[0] eq $bins->[0] ),
-                    active  => 0 + ( $chain->[0] eq $bins->[1] ),
-                    fallen  => 0 + ( $chain->[0] eq $bins->[2] ),
+                    safe    => 0 + ( $active && $chain->[0] eq $bins->[0] ),
+                    active  => 0 + ( $active && $chain->[0] eq $bins->[1] ),
+                    fallen  => 0 + ( $active && $chain->[0] eq $bins->[2] ),
                 },
                     map +{
                     game    => $game,

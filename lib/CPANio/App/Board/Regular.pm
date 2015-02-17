@@ -1,13 +1,16 @@
-package CPANio::App::Board;
+package CPANio::App::Board::Regular;
 
 use Web::Simple;
 use Plack::Response;
+
+use CPANio;
 use CPANio::Schema;
 
 sub _build_final_dispatcher { sub () {} }
 
 sub dispatch_request {
     my ($self) = @_;
+    my $schema = $CPANio::schema;
 
     my $order_by
         = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
@@ -19,12 +22,11 @@ sub dispatch_request {
 
     # get the date of the latest release considered
     my $latest_release =
-      $self->config->{schema}->resultset('Timestamps')
+      $schema->resultset('Timestamps')
       ->find( { game => 'backpan-release' } )->latest_update;
 
     # show every current competition
-    sub (/once-a/) {
-        my $schema = $self->config->{schema};
+    sub (/) {
         my $tt     = $self->config->{template};
         my $vars   = {
             latest => $latest_release,
@@ -53,7 +55,7 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
-    sub (/once-a/*/) {
+    sub (/*/) {
         my ( $self, $period, $env ) = @_;
 
         my %games;
@@ -63,7 +65,6 @@ sub dispatch_request {
 
         return if !exists $games{$period};
 
-        my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
             latest => $latest_release,
@@ -91,7 +92,7 @@ sub dispatch_request {
 
     },
 
-    sub (/once-a/*/*/) {
+    sub (/*/*/) {
         my ( $self, $period, $game, $env ) = @_;
 
         my $class = $game_class{$game};
@@ -100,16 +101,15 @@ sub dispatch_request {
 
         my $year = 1900 + (gmtime)[5];
         my @contests = ( 'current', $year, 'all-time' );
-        my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
             latest => $latest_release,
             boards => [
                 map {
                     my @yearly = /^[0-9]+$/ ? (
-                        url => "$_.html",
-                      ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                      ( next     => $_ + 1 )x!! ( $_ < 1900 + (gmtime)[5] ),
+                        url      => "$_.html",
+                        previous => ( $_ > 1995  ? $_ - 1 : 'years' ),
+                        next     => ( $_ < $year ? $_ + 1 : 'years' ),
                     ) : ();
                     {   entries =>
                             scalar $schema->resultset("OnceA\u$period")
@@ -134,33 +134,39 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
-    sub (/once-a/*/*/*) {
+    sub (/*/*/*) {
         my ( $self, $period, $game, $year, $env ) = @_;
 
         my $class = $game_class{$game};
         return if !$class;
         return if !grep $period eq $_, $class->periods;
-        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])$/;
+        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])|years$/;
 
-        my $schema   = $self->config->{schema};
-        my $tt       = $self->config->{template};
-        my $vars     = {
+        my $current = 1900 + (gmtime)[5];
+        my @years   = $year ne 'years' ? $year : reverse 1995 .. $current;
+        my $tt      = $self->config->{template};
+        my $vars    = {
             latest => $latest_release,
             boards => [
-                map +{
-                    entries =>
-                        scalar $schema->resultset("OnceA\u$period")->search(
-                        { game => $game, contest  => $_ },
-                        { order_by => $order_by }
-                        ),
-                    title => $_,
-                    game  => $game,
-                  ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                  ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
-                },
-                $year
+                map {
+                    my @yearly = @years == 1
+                        ? ( previous => $_ > 1995     ? $_ - 1 : 'years',
+                            next     => $_ < $current ? $_ + 1 : 'years' )
+                        : ( url      => "$_.html" );
+                    {   entries =>
+                            scalar $schema->resultset("OnceA\u$period")
+                            ->search(
+                            { game     => $game, contest => $_ },
+                            { order_by => $order_by }
+                            ),
+                        title => $_,
+                        game  => $game,
+                        @yearly,
+                    }
+                }
+                @years
             ],
-            limit    => 200,
+            limit    => @years == 1 ? 200 : 10,
             period   => $period,
             game     => $game,
             contests => [$year],

@@ -6,11 +6,10 @@ use Path::Class;
 my $base;
 
 BEGIN {
-    $base = dir($FindBin::Bin)->parent->subdir('site');
-    unshift @INC, $base->parent->subdir('lib')->stringify;
+    unshift @INC, dir($FindBin::Bin)->parent->subdir('lib')->stringify;
 }
 
 use CPANio::App;
 
-CPANio::App->new( config => { base_dir => $base, ui => 'layout' } )
+CPANio::App->new( config => { ui => 'layout' } )
     ->run_if_script;

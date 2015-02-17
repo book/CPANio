@@ -1,7 +1,7 @@
 <table width="100%" align="center">
     <tr valign="top">[% prev_game = boards.0.game %]
         [% FOREACH board IN boards %]
-        [% IF !period && board.game != prev_game %]</tr><tr valign=top>[% END %][% prev_game = board.game %]
+        [% IF period ? !(loop.index % 5) : board.game != prev_game %]</tr><tr valign=top>[% END %][% prev_game = board.game %]
             <td align="center" style="padding-bottom: 2em">
             [% PROCESS board/once_a/leaderboard
                title    = board.title

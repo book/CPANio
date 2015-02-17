@@ -1,4 +1,4 @@
-<h1>CPAN once-a-[% period %] [% game %] for [% year %]</h1>
+<h1>CPAN once-a-[% period %] [% game %] [% IF year == 'years' %](all years)[% ELSE %]for [% year %][% END %]</h1>
 <p>
 Release something to CPAN each [% period %] for a year.
 How many [% period %]s can you keep that up?
