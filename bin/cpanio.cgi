@@ -6,8 +6,7 @@ use Path::Class;
 my $base;
 
 BEGIN {
-    $base = dir($FindBin::Bin)->parent->subdir('site');
-    unshift @INC, $base->parent->subdir('lib')->stringify;
+    unshift @INC, dir($FindBin::Bin)->parent->subdir('lib')->stringify;
 }
 
 use CPANio::App;
