@@ -12,5 +12,5 @@ BEGIN {
 
 use CPANio::App;
 
-CPANio::App->new( config => { base_dir => $base, ui => 'layout' } )
+CPANio::App->new( config => { ui => 'layout' } )
     ->run_if_script;
