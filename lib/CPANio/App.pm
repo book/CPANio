@@ -94,9 +94,9 @@ sub dispatch_request {
         },
 
         # other handlers
-        sub (/board/...) {
+        sub (/board/once-a/...) {
             my ( $self, $env ) = @_;
-            $self->handler_for('Board')->($env);
+            $self->handler_for('Board/Regular')->($env);
         },
 
         # assume the requested page is a "document"

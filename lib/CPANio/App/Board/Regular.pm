@@ -1,4 +1,4 @@
-package CPANio::App::Board;
+package CPANio::App::Board::Regular;
 
 use Web::Simple;
 use Plack::Response;
@@ -23,7 +23,7 @@ sub dispatch_request {
       ->find( { game => 'backpan-release' } )->latest_update;
 
     # show every current competition
-    sub (/once-a/) {
+    sub (/) {
         my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
@@ -53,7 +53,7 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
-    sub (/once-a/*/) {
+    sub (/*/) {
         my ( $self, $period, $env ) = @_;
 
         my %games;
@@ -91,7 +91,7 @@ sub dispatch_request {
 
     },
 
-    sub (/once-a/*/*/) {
+    sub (/*/*/) {
         my ( $self, $period, $game, $env ) = @_;
 
         my $class = $game_class{$game};
@@ -134,7 +134,7 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
-    sub (/once-a/*/*/*) {
+    sub (/*/*/*) {
         my ( $self, $period, $game, $year, $env ) = @_;
 
         my $class = $game_class{$game};
