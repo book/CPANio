@@ -2,12 +2,15 @@ package CPANio::App::Board::Regular;
 
 use Web::Simple;
 use Plack::Response;
+
+use CPANio;
 use CPANio::Schema;
 
 sub _build_final_dispatcher { sub () {} }
 
 sub dispatch_request {
     my ($self) = @_;
+    my $schema = $CPANio::schema;
 
     my $order_by
         = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
@@ -19,12 +22,11 @@ sub dispatch_request {
 
     # get the date of the latest release considered
     my $latest_release =
-      $self->config->{schema}->resultset('Timestamps')
+      $schema->resultset('Timestamps')
       ->find( { game => 'backpan-release' } )->latest_update;
 
     # show every current competition
     sub (/) {
-        my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
             latest => $latest_release,
@@ -63,7 +65,6 @@ sub dispatch_request {
 
         return if !exists $games{$period};
 
-        my $schema = $self->config->{schema};
         my $tt     = $self->config->{template};
         my $vars   = {
             latest => $latest_release,
@@ -100,7 +101,6 @@ sub dispatch_request {
 
         my $year = 1900 + (gmtime)[5];
         my @contests = ( 'current', $year, 'all-time' );
-        my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
             latest => $latest_release,
@@ -142,7 +142,6 @@ sub dispatch_request {
         return if !grep $period eq $_, $class->periods;
         return if $year !~ /^(?:199[5-9]|20[0-9][0-9])$/;
 
-        my $schema   = $self->config->{schema};
         my $tt       = $self->config->{template};
         my $vars     = {
             latest => $latest_release,

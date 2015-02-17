@@ -33,9 +33,6 @@ sub BUILD {
     $config->{template} //= Template->new(
         INCLUDE_PATH => $config->{templates_dir},
     );
-
-    $config->{schema} //= $CPANio::schema;
-
 }
 
 # automatically load, configure and cache a sub-application handler
