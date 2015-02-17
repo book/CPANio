@@ -109,7 +109,7 @@ sub dispatch_request {
                     my @yearly = /^[0-9]+$/ ? (
                         url => "$_.html",
                       ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                      ( next     => $_ + 1 )x!! ( $_ < 1900 + (gmtime)[5] ),
+                      ( next     => $_ + 1 )x!! ( $_ < $year ),
                     ) : ();
                     {   entries =>
                             scalar $schema->resultset("OnceA\u$period")
@@ -142,8 +142,9 @@ sub dispatch_request {
         return if !grep $period eq $_, $class->periods;
         return if $year !~ /^(?:199[5-9]|20[0-9][0-9])$/;
 
-        my $tt       = $self->config->{template};
-        my $vars     = {
+        my $current = 1900 + (gmtime)[5];
+        my $tt      = $self->config->{template};
+        my $vars    = {
             latest => $latest_release,
             boards => [
                 map +{
@@ -155,7 +156,7 @@ sub dispatch_request {
                     title => $_,
                     game  => $game,
                   ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                  ( next     => $_ + 1 )x!! ( $year < 1900 + (gmtime)[5] ),
+                  ( next     => $_ + 1 )x!! ( $year < $current ),
                 },
                 $year
             ],
