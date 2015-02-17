@@ -140,27 +140,33 @@ sub dispatch_request {
         my $class = $game_class{$game};
         return if !$class;
         return if !grep $period eq $_, $class->periods;
-        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])$/;
+        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])|years$/;
 
         my $current = 1900 + (gmtime)[5];
+        my @years   = $year ne 'years' ? $year : reverse 1995 .. $current;
         my $tt      = $self->config->{template};
         my $vars    = {
             latest => $latest_release,
             boards => [
-                map +{
-                    entries =>
-                        scalar $schema->resultset("OnceA\u$period")->search(
-                        { game => $game, contest  => $_ },
-                        { order_by => $order_by }
-                        ),
-                    title => $_,
-                    game  => $game,
-                  ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                  ( next     => $_ + 1 )x!! ( $year < $current ),
-                },
-                $year
+                map {
+                    my @yearly = @years == 1
+                        ? ( ( previous => $_ - 1 )x!! ( $_ > 1995 ),
+                            ( next     => $_ + 1 )x!! ( $_ < $year ) )
+                        : ( url      => "$_.html" );
+                    {   entries =>
+                            scalar $schema->resultset("OnceA\u$period")
+                            ->search(
+                            { game     => $game, contest => $_ },
+                            { order_by => $order_by }
+                            ),
+                        title => $_,
+                        game  => $game,
+                        @yearly,
+                    }
+                }
+                @years
             ],
-            limit    => 200,
+            limit    => @years == 1 ? 200 : 10,
             period   => $period,
             game     => $game,
             contests => [$year],
