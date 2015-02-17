@@ -107,9 +107,9 @@ sub dispatch_request {
             boards => [
                 map {
                     my @yearly = /^[0-9]+$/ ? (
-                        url => "$_.html",
-                      ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                      ( next     => $_ + 1 )x!! ( $_ < $year ),
+                        url      => "$_.html",
+                        previous => ( $_ > 1995  ? $_ - 1 : 'years' ),
+                        next     => ( $_ < $year ? $_ + 1 : 'years' ),
                     ) : ();
                     {   entries =>
                             scalar $schema->resultset("OnceA\u$period")
@@ -150,8 +150,8 @@ sub dispatch_request {
             boards => [
                 map {
                     my @yearly = @years == 1
-                        ? ( ( previous => $_ - 1 )x!! ( $_ > 1995 ),
-                            ( next     => $_ + 1 )x!! ( $_ < $year ) )
+                        ? ( previous => $_ > 1995     ? $_ - 1 : 'years',
+                            next     => $_ < $current ? $_ + 1 : 'years' )
                         : ( url      => "$_.html" );
                     {   entries =>
                             scalar $schema->resultset("OnceA\u$period")
