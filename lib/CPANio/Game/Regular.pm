@@ -3,6 +3,7 @@ package CPANio::Game::Regular;
 use 5.010;
 use strict;
 use warnings;
+use Carp;
 use BackPAN::Index;
 
 use CPANio;
@@ -225,6 +226,21 @@ sub periods {
 }
 
 # CLASS METHODS
+
+sub bins_rs {
+    my ( $class, $period ) = @_;
+    my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
+
+    if ($period) {
+        croak "Unknonw period $period" if !exists $LIKE{$period};
+        return $bins_rs->search(
+            { bin      => { like  => $LIKE{$period} } },
+            { order_by => { -desc => 'bin' } }
+        );
+    }
+
+    return $bins_rs;
+}
 
 sub latest_bins_update {
     my $class = shift;
