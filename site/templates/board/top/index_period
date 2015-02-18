@@ -1,0 +1,9 @@
+<h1>CPAN top [% period %]s</h1>
+
+[% PROCESS board/once_a/abstract_game %]
+[% PROCESS board/once_a/abstract_period %]
+<p>
+The tables below list the top [% limit %] [% period %]s for each type.
+</p>
+[% PROCESS board/top/board_list %]
+[% PROCESS board/once_a/date_generated %]

@@ -1,0 +1,15 @@
+<h1>CPAN [% game %] top [% period %]s</h1>
+[% SWITCH game %]
+[% CASE 'releases' %]
+
+[% CASE 'distributions' %]
+
+[% END %]
+
+[% PROCESS board/once_a/abstract_game %]
+[% PROCESS board/once_a/abstract_period %]
+<p>
+The tables below list the top [% period %]s up to rank [% limit %].
+</p>
+[% PROCESS board/top/board_list %]
+[% PROCESS board/once_a/date_generated %]
