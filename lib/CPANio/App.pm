@@ -90,10 +90,15 @@ sub dispatch_request {
             }
         },
 
-        # other handlers
+        # board handlers
         sub (/board/once-a/...) {
             my ( $self, $env ) = @_;
             $self->handler_for('Board/Regular')->($env);
+        },
+
+        sub (/board/top/...) {
+            my ( $self, $env ) = @_;
+            $self->handler_for('Board/Top')->($env);
         },
 
         # assume the requested page is a "document"
