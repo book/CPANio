@@ -43,7 +43,7 @@ sub dispatch_request {
                         url   => "$_/$game/",
                         game  => $game,
                         },
-                        $_->periods
+                        $_->author_periods
                     } @classes
             ],
             limit => 10,
@@ -60,7 +60,8 @@ sub dispatch_request {
 
         my %games;
         for my $class (@classes) {
-            push @{ $games{$_} }, $class->game_name for $class->periods;
+            push @{ $games{$_} }, $class->game_name
+                for $class->author_periods;
         }
 
         return if !exists $games{$period};
@@ -97,7 +98,7 @@ sub dispatch_request {
 
         my $class = $game_class{$game};
         return if !$class;
-        return if !grep $period eq $_, $class->periods;
+        return if !grep $period eq $_, $class->author_periods;
 
         my $year = 1900 + (gmtime)[5];
         my @contests = ( 'current', $year, 'all-time' );
@@ -139,8 +140,8 @@ sub dispatch_request {
 
         my $class = $game_class{$game};
         return if !$class;
-        return if !grep $period eq $_, $class->periods;
-        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])|years$/;
+        return if !grep $period eq $_, $class->author_periods;
+        return if $year !~ /^(?:199[5-9]|20[0-9][0-9]|years)$/;
 
         my $current = 1900 + (gmtime)[5];
         my @years   = $year ne 'years' ? $year : reverse 1995 .. $current;

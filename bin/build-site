@@ -1,4 +1,27 @@
 #!/bin/sh
+USAGE="Usage: $0 [ -v ] [ <directory> ]"
+QUIET=--quiet
+
+# command-line options
+OPTS=`getopt -o v -n "$0" -- "$@"`
+if [ $? != 0 ] ; then
+    echo $USAGE >&2
+    exit 1
+fi
+
+eval set -- "$OPTS"
+while true ; do
+    case "$1" in
+        -v)
+            QUIET=
+            shift ;;
+        --) shift ; break ;;
+        *)
+            echo "Internal error!" >&2
+            echo $USAGE            >&2
+            exit 1 ;;
+    esac
+done
 
 # our directories
 SRC=`readlink -f $(dirname $0)/..`
@@ -13,7 +36,7 @@ if [ ! -e $DST ] ; then mkdir -p $DST ; fi
 # generate the static pages
 eval `perl -Mlocal::lib`
 wallflower \
-    --quiet \
+    $QUIET \
     --include $SRC/lib \
     --destination $DST \
     --application $SRC/bin/cpanio.cgi

@@ -1,10 +1,9 @@
 <h1>CPAN once-a-[% period %] [% game %] [% IF year == 'years' %](all years)[% ELSE %]for [% year %][% END %]</h1>
-<p>
-Release something to CPAN each [% period %] for a year.
-How many [% period %]s can you keep that up?
-</p>
+
+[% PROCESS board/once_a/abstract_game %]
+[% PROCESS board/once_a/abstract_period %]
 <p>
 The tables below list the top participants up to rank [% limit %].
 </p>
 [% PROCESS board/once_a/board_list %]
-[% PROCESS board/once_a/date_generated %]
+[% PROCESS board/date_generated %]
