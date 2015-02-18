@@ -32,6 +32,7 @@ a co-maintained one).</p>
 [% END %]
 
 [% PROCESS board/once_a/abstract_game %]
+[% PROCESS board/once_a/abstract_timings %]
 [% PROCESS board/once_a/abstract_period %]
 <p>
 The tables below list the top participants up to rank [% limit %].
