@@ -227,6 +227,8 @@ sub periods {
 
 # CLASS METHODS
 
+sub author_periods { shift->periods; }
+
 sub bins_rs {
     my ( $class, $period, $prefix ) = @_;
     my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
