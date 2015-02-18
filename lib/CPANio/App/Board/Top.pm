@@ -149,6 +149,49 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
+    sub (/*/*/*) {
+        my ( $self, $period, $game, $year, $env ) = @_;
+
+        my $class = $game_class{$game};
+        return if !$class;
+        return if !grep $period eq $_, $class->periods;
+        return if $year !~ /^(?:199[5-9]|20[0-9][0-9]|years)$/;
+
+        my $current = 1900 + (gmtime)[5];
+        my @years = $year ne 'years' ? $year : reverse 1995 .. $current;
+        my $vars = {
+            latest => $latest_release,
+            boards => [
+                map {
+                    my @yearly
+                        = @years == 1
+                        ? (
+                        previous => $_ > 1995     ? $_ - 1 : 'years',
+                        next     => $_ < $current ? $_ + 1 : 'years'
+                        )
+                        : ( url => "$_.html" );
+                    {   entries =>
+                            $class->bins_rs( $period, /^[0-9]+$/ ? $_ : () )
+                            ->search_rs( {}, $attr{$period} ),
+                        title => $_,
+                        game  => $game,
+                        @yearly,
+                    }
+                } @years
+            ],
+            limit => @years == 1 ? 200 : 10,
+            period   => $period,
+            game     => $game,
+            contests => [$year],
+            year     => $year,
+        };
+
+        $tt->process( 'board/top/index_year', $vars, \my $output )
+            or die $tt->error();
+
+        [ 200, [ 'Content-type', 'text/html' ], [$output] ];
+    },
+
 }
 
 1;
