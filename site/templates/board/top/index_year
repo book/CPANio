@@ -1,10 +1,8 @@
 <h1>CPAN [% game %] top [% period %]s [% IF year == 'years' %](all years)[% ELSE %]for [% year %][% END %]</h1>
+[% PROCESS board/top/abstract_game %]
+[% PROCESS board/top/abstract_period %]
 <p>
-Release something to CPAN each [% period %] for a year.
-How many [% period %]s can you keep that up?
-</p>
-<p>
-The tables below list the top participants up to rank [% limit %].
+The tables below list the top [% period %]s up to rank [% limit %].
 </p>
 [% PROCESS board/top/board_list %]
 [% PROCESS board/date_generated %]

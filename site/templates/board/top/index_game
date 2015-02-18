@@ -6,8 +6,8 @@
 
 [% END %]
 
-[% PROCESS board/once_a/abstract_game %]
-[% PROCESS board/once_a/abstract_period %]
+[% PROCESS board/top/abstract_game %]
+[% PROCESS board/top/abstract_period %]
 <p>
 The tables below list the top [% period %]s up to rank [% limit %].
 </p>

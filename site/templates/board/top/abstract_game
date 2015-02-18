@@ -1,0 +1,9 @@
+<p>
+Count the number of
+[% SWITCH game -%]
+[% CASE 'releases' %]distributions
+[% CASE 'distributions' %]new (for their author) distributions
+[% CASE 'new-distributions' %]entirely new distributions
+[% END %]
+released to CPAN each [% period %].
+</p>
