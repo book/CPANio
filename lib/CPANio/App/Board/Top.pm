@@ -108,6 +108,47 @@ sub dispatch_request {
 
     },
 
+    sub (/*/*/) {
+        my ( $self, $period, $game, $env ) = @_;
+
+        my $class = $game_class{$game};
+        return if !$class;
+        return if !grep $period eq $_, $class->periods;
+
+        my $year = 1900 + (gmtime)[5];
+        my @contests = ( $year, 'all-time' );
+        my $vars = {
+            latest => $latest_release,
+            boards => [
+                map {
+                    my @yearly = /^[0-9]+$/
+                        ? (
+                        url      => "$_.html",
+                        previous => ( $_ > 1995 ? $_ - 1 : 'years' ),
+                        next     => ( $_ < $year ? $_ + 1 : 'years' ),
+                        )
+                        : ();
+                    {   entries => $class->bins_rs( $period,
+                            /^[0-9]+$/ ? $year : () )
+                            ->search_rs( {}, $attr{$period} ),
+                        title => $_,
+                        game  => $game,
+                        @yearly,
+                    }
+                } @contests
+            ],
+            limit    => 200,
+            period   => $period,
+            game     => $game,
+            contests => \@contests,
+        };
+
+        $tt->process( 'board/top/index_game', $vars, \my $output )
+            or die $tt->error();
+
+        [ 200, [ 'Content-type', 'text/html' ], [$output] ];
+    },
+
 }
 
 1;
