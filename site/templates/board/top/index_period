@@ -6,4 +6,4 @@
 The tables below list the top [% limit %] [% period %]s for each type.
 </p>
 [% PROCESS board/top/board_list %]
-[% PROCESS board/once_a/date_generated %]
+[% PROCESS board/date_generated %]

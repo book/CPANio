@@ -37,4 +37,4 @@ a co-maintained one).</p>
 The tables below list the top participants up to rank [% limit %].
 </p>
 [% PROCESS board/once_a/board_list %]
-[% PROCESS board/once_a/date_generated %]
+[% PROCESS board/date_generated %]
