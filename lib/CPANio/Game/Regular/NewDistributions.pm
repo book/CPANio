@@ -33,7 +33,9 @@ sub game_name { 'new-distributions' }
 
 sub resultclass_name { 'NewDistributionBins' }
 
-sub periods {qw( month week )}
+sub periods {qw( month week day )}
+
+sub author_periods {qw( month week )}
 
 1;
 
