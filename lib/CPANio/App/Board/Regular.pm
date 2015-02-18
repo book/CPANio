@@ -140,7 +140,7 @@ sub dispatch_request {
         my $class = $game_class{$game};
         return if !$class;
         return if !grep $period eq $_, $class->periods;
-        return if $year !~ /^(?:199[5-9]|20[0-9][0-9])|years$/;
+        return if $year !~ /^(?:199[5-9]|20[0-9][0-9]|years)$/;
 
         my $current = 1900 + (gmtime)[5];
         my @years   = $year ne 'years' ? $year : reverse 1995 .. $current;
