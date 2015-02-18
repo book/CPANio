@@ -80,6 +80,34 @@ sub dispatch_request {
         [ 200, [ 'Content-type', 'text/html' ], [$output] ];
     },
 
+    sub (/*/) {
+        my ( $self, $period, $env ) = @_;
+
+        return if !exists $games{$period};
+
+        my $vars = {
+            latest => $latest_release,
+            boards => [
+                map {
+                    {   entries => $game_class{$_}->bins_rs($period)
+                            ->search_rs( {}, $attr{$period} ),
+                        title => $_,
+                        game  => $_,
+                        url   => "$_/",
+                    }
+                } @{ $games{$period} }
+            ],
+            limit  => 10,
+            period => $period,
+        };
+
+        $tt->process( 'board/top/index_period', $vars, \my $output )
+            or die $tt->error();
+
+        [ 200, [ 'Content-type', 'text/html' ], [$output] ];
+
+    },
+
 }
 
 1;
