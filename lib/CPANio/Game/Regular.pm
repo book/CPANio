@@ -323,7 +323,7 @@ sub update_boards {
 sub update {
     my ($class) = @_;
     $class->update_author_bins();
-    $class->update_boards( $class->periods );
+    $class->update_boards( $class->author_periods );
     $class->update_done();
 }
 
