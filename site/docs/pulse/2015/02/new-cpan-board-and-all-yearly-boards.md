@@ -51,7 +51,7 @@ Similar indexes are also available for the top CPAN periods boards:
 - [top months of releases](/board/top/month/releases/years.html)
 - [top months of distributions](/board/top/month/distributions/years.html)
 - [top months of new-distributions](/board/top/month/new-distributions/years.html)
-- [top dais of releases](/board/top/day/releases/years.html)
+- [top days of releases](/board/top/day/releases/years.html)
 - [top days of distributions](/board/top/day/distributions/years.html)
 - [top days of new-distributions](/board/top/day/new-distributions/years.html)
 
