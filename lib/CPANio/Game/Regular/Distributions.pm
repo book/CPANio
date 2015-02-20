@@ -10,8 +10,11 @@ our @ISA = qw( CPANio::Game::Regular );
 # PRIVATE FUNCTIONS
 
 sub compute_author_bins {
-    my ( $class, $since ) = @_;
+    my ($class) = @_;
+    my $latest_release = $class->latest_update;
     my %bins;
+
+    # compute first release date per author for each dist
     my %date;
     $date{ $_->cpanid }{ $_->dist } = $_->date
         for $class->backpan->releases->search(
@@ -21,8 +24,9 @@ sub compute_author_bins {
             group_by => [ 'cpanid', 'dist' ]
         }
         )->all;
-    my $latest_release;
-    my $releases = $class->get_releases;
+
+    # update bins
+    my $releases = $class->get_releases($latest_release);
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;

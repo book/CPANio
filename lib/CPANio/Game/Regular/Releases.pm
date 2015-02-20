@@ -10,10 +10,10 @@ our @ISA = qw( CPANio::Game::Regular );
 # PRIVATE FUNCTIONS
 
 sub compute_author_bins {
-    my ( $class, $since ) = @_;
+    my ($class) = @_;
     my %bins;
-    my $latest_release;
-    my $releases = $class->get_releases;
+    my $latest_release = $class->latest_update;
+    my $releases       = $class->get_releases($latest_release);
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;

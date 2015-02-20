@@ -246,15 +246,6 @@ sub bins_rs {
     return $bins_rs;
 }
 
-sub latest_bins_update {
-    my $class = shift;
-    my $bin = $CPANio::schema->resultset( $class->resultclass_name )
-        ->search( { bin => { like => 'D%' } } )->get_column('bin')->max;
-    return $bin
-        ? CPANio::Bins->bin_to_epoch($bin)
-        : $CPANio::Bins::FIRST_RELEASE_TIME;
-}
-
 sub backpan {
     state $backpan = BackPAN::Index->new(
         cache_ttl => 3600,    # 1 hour
@@ -265,43 +256,50 @@ sub backpan {
 }
 
 sub get_releases {
-    my $class = shift;
+    my ( $class, $since ) = @_;
+    $since ||= $CPANio::Bins::FIRST_RELEASE_TIME - 1;
 
     return $class->backpan->releases->search(
-        { date     => { '>', $class->latest_bins_update } },
+        { date     => { '>', $since } },
         { order_by => 'date', prefetch => 'dist' }
     );
 }
 
 sub update_author_bins {
-    my ( $class, $since ) = @_;
-    my ( $bins, $latest_release ) = $class->compute_author_bins($since);
+    my ($class) = @_;
+    my ( $bins, $latest_release ) = $class->compute_author_bins();
 
     my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
-    if ( $bins_rs->count ) {    # update
-        for my $bin ( keys %$bins ) {
-            for my $author ( keys %{ $bins->{$bin} } ) {
-                my $row = $bins_rs->find_or_create(
-                    { author => $author, bin => $bin } );
-                $row->count( ( $row->count || 0 ) + $bins->{$bin}{$author} );
-                $row->update;
+    $CPANio::schema->txn_do(
+        sub {
+            if ( $bins_rs->count ) {    # update
+                for my $bin ( keys %$bins ) {
+                    for my $author ( keys %{ $bins->{$bin} } ) {
+                        my $row = $bins_rs->find_or_create(
+                            { author => $author, bin => $bin } );
+                        $row->count(
+                            ( $row->count || 0 ) + $bins->{$bin}{$author} );
+                        $row->update;
+                    }
+                }
             }
+            else {                      # create
+                $bins_rs->populate(
+                    [   map {
+                            my $bin = $_;
+                            map +{
+                                bin    => $bin,
+                                author => $_,
+                                count  => $bins->{$bin}{$_}
+                                },
+                                keys %{ $bins->{$bin} }
+                            } keys %$bins
+                    ]
+                );
+            }
+            $class->update_done($latest_release);
         }
-    }
-    else {                      # create
-        $bins_rs->populate(
-            [   map {
-                    my $bin = $_;
-                    map +{
-                        bin    => $bin,
-                        author => $_,
-                        count  => $bins->{$bin}{$_}
-                        },
-                        keys %{ $bins->{$bin} }
-                    } keys %$bins
-            ]
-        );
-    }
+    );
 
     return $latest_release;
 }
@@ -321,10 +319,12 @@ sub update_boards {
 }
 
 sub update {
-    my ($class) = @_;
-    $class->update_author_bins();
-    $class->update_boards( $class->author_periods );
-    $class->update_done();
+    my ($class)  = @_;
+    my $previous = $class->latest_update;
+    my $latest   = $class->update_author_bins();
+
+    $class->update_boards( $class->author_periods )
+        if $latest > $previous;
 }
 
 1;
