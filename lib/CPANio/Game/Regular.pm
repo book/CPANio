@@ -246,15 +246,6 @@ sub bins_rs {
     return $bins_rs;
 }
 
-sub latest_bins_update {
-    my $class = shift;
-    my $bin = $CPANio::schema->resultset( $class->resultclass_name )
-        ->search( { bin => { like => 'D%' } } )->get_column('bin')->max;
-    return $bin
-        ? CPANio::Bins->bin_to_epoch($bin)
-        : $CPANio::Bins::FIRST_RELEASE_TIME;
-}
-
 sub backpan {
     state $backpan = BackPAN::Index->new(
         cache_ttl => 3600,    # 1 hour
@@ -265,10 +256,11 @@ sub backpan {
 }
 
 sub get_releases {
-    my $class = shift;
+    my ( $class, $since ) = @_;
+    $since ||= $CPANio::Bins::FIRST_RELEASE_TIME - 1;
 
     return $class->backpan->releases->search(
-        { date     => { '>', $class->latest_bins_update } },
+        { date     => { '>', $since } },
         { order_by => 'date', prefetch => 'dist' }
     );
 }
