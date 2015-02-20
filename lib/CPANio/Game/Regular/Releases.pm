@@ -13,7 +13,7 @@ sub compute_author_bins {
     my ( $class, $since ) = @_;
     my %bins;
     my $latest_release;
-    my $releases = $class->get_releases;
+    my $releases = $class->get_releases($since);
     while ( my $release = $releases->next ) {
         my $author = $release->cpanid;
         $latest_release = $release->date;

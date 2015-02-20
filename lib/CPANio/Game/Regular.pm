@@ -274,8 +274,9 @@ sub get_releases {
 }
 
 sub update_author_bins {
-    my ( $class, $since ) = @_;
-    my ( $bins, $latest_release ) = $class->compute_author_bins($since);
+    my ($class) = @_;
+    my ( $bins, $latest_release )
+        = $class->compute_author_bins( $class->latest_update );
 
     my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
     if ( $bins_rs->count ) {    # update
@@ -303,6 +304,8 @@ sub update_author_bins {
         );
     }
 
+    $class->update_done($latest_release);
+
     return $latest_release;
 }
 
@@ -324,7 +327,6 @@ sub update {
     my ($class) = @_;
     $class->update_author_bins();
     $class->update_boards( $class->author_periods );
-    $class->update_done();
 }
 
 1;
