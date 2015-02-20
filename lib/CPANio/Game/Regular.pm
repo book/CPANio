@@ -267,8 +267,7 @@ sub get_releases {
 
 sub update_author_bins {
     my ($class) = @_;
-    my ( $bins, $latest_release )
-        = $class->compute_author_bins( $class->latest_update );
+    my ( $bins, $latest_release ) = $class->compute_author_bins();
 
     my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
     $CPANio::schema->txn_do(
