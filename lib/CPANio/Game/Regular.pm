@@ -271,32 +271,36 @@ sub update_author_bins {
         = $class->compute_author_bins( $class->latest_update );
 
     my $bins_rs = $CPANio::schema->resultset( $class->resultclass_name );
-    if ( $bins_rs->count ) {    # update
-        for my $bin ( keys %$bins ) {
-            for my $author ( keys %{ $bins->{$bin} } ) {
-                my $row = $bins_rs->find_or_create(
-                    { author => $author, bin => $bin } );
-                $row->count( ( $row->count || 0 ) + $bins->{$bin}{$author} );
-                $row->update;
+    $CPANio::schema->txn_do(
+        sub {
+            if ( $bins_rs->count ) {    # update
+                for my $bin ( keys %$bins ) {
+                    for my $author ( keys %{ $bins->{$bin} } ) {
+                        my $row = $bins_rs->find_or_create(
+                            { author => $author, bin => $bin } );
+                        $row->count(
+                            ( $row->count || 0 ) + $bins->{$bin}{$author} );
+                        $row->update;
+                    }
+                }
             }
+            else {                      # create
+                $bins_rs->populate(
+                    [   map {
+                            my $bin = $_;
+                            map +{
+                                bin    => $bin,
+                                author => $_,
+                                count  => $bins->{$bin}{$_}
+                                },
+                                keys %{ $bins->{$bin} }
+                            } keys %$bins
+                    ]
+                );
+            }
+            $class->update_done($latest_release);
         }
-    }
-    else {                      # create
-        $bins_rs->populate(
-            [   map {
-                    my $bin = $_;
-                    map +{
-                        bin    => $bin,
-                        author => $_,
-                        count  => $bins->{$bin}{$_}
-                        },
-                        keys %{ $bins->{$bin} }
-                    } keys %$bins
-            ]
-        );
-    }
-
-    $class->update_done($latest_release);
+    );
 
     return $latest_release;
 }
