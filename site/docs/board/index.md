@@ -25,3 +25,5 @@ For now, we only offer very few boards:
         - [new-distributions](top/month/new-distributions/)
     - [day](top/day/)
         - [releases](top/day/releases/)
+        - [distributions](top/day/distributions/)
+        - [new-distributions](top/day/new-distributions/)
