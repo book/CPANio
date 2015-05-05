@@ -7,7 +7,6 @@ For now, we only offer very few boards:
     - [week](once-a/week/)
         - [releases](once-a/week/releases/)
         - [distributions](once-a/week/distributions/)
-        - [new-distributions](once-a/week/new-distributions/)
     - [month](once-a/month/)
         - [releases](once-a/month/releases/)
         - [distributions](once-a/month/distributions/)
@@ -26,3 +25,5 @@ For now, we only offer very few boards:
         - [new-distributions](top/month/new-distributions/)
     - [day](top/day/)
         - [releases](top/day/releases/)
+        - [distributions](top/day/distributions/)
+        - [new-distributions](top/day/new-distributions/)

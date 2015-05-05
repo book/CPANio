@@ -34,7 +34,7 @@ sub resultclass_name { 'NewDistributionBins' }
 
 sub periods {qw( month week day )}
 
-sub author_periods {qw( month week )}
+sub author_periods {qw( month )}
 
 1;
 
@@ -42,7 +42,7 @@ __END__
 
 =head1 NAME
 
-CPANio::Game::Regular::NewDistributions - Compute the boards for regular distributions
+CPANio::Game::Regular::NewDistributions - Compute the boards for new distributions
 
 =head1 SYNPOPSIS
 
@@ -52,13 +52,13 @@ CPANio::Game::Regular::NewDistributions - Compute the boards for regular distrib
 
 =head1 DESCRIPTION
 
-This board computes the chains for "regular distributions" game, i.e. authors
+This board computes the chains for "new distributions" game, i.e. authors
 who publish a new CPAN distribution (for CPAN) at least once every period.
 
 =head2 Periods
 
 The boards for this game are computed for the following periods:
-month and week.
+month.
 
 =head1 AUTHOR
 
