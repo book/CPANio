@@ -18,7 +18,6 @@ For now, we only offer very few boards:
     - [week](top/week/)
         - [releases](top/week/releases/)
         - [distributions](top/week/distributions/)
-        - [new-distributions](top/week/new-distributions/)
     - [month](top/month/)
         - [releases](top/month/releases/)
         - [distributions](top/month/distributions/)
