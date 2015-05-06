@@ -5,6 +5,11 @@ use Plack::Response;
 use Path::Class;
 use Text::Markdown::PerlExtensions 'markdown';
 
+my %process = (
+    md   => sub { markdown(shift) },
+    html => sub { shift },
+);
+
 sub dispatch_request {
     my ($self) = @_;
 
@@ -20,14 +25,22 @@ sub dispatch_request {
     # a document page to render
     sub (/**) {
         my ( $self, $page, $env ) = @_;
-        my $file = eval { file( $docs_dir, $page . '.md' )->resolve };
+
+        # pick up the source file
+        my ( $file, $format );
+        for my $ext (qw( html md )) {
+            $format = $ext;
+            $file = eval { file( $docs_dir, "$page.$ext" )->resolve };
+            last if defined $file;
+        }
+
         return if !$file;
         return Plack::Response->new(403)->finalize
             if !$docs_dir->contains($file);
 
         [   200,
             [ 'Content-type', 'text/html' ],
-            [ markdown( scalar $file->slurp ) ]
+            [ $process{$format}->( scalar $file->slurp ) ]
         ];
     }
 
