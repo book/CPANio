@@ -38,9 +38,16 @@ sub dispatch_request {
         return Plack::Response->new(403)->finalize
             if !$docs_dir->contains($file);
 
+        my $tt = $self->config->{template};
+        $tt->process(
+            $self->config->{docs_wrapper},
+            { content => $process{$format}->( scalar $file->slurp ) },
+            \( my $output = "" )
+        ) or die $tt->error();
+
         [   200,
             [ 'Content-type', 'text/html' ],
-            [ $process{$format}->( scalar $file->slurp ) ]
+            [ $output ]
         ];
     }
 
