@@ -130,7 +130,11 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
         $github =~ s{(?:/|\.git)$}{};
 
         # table of content
-        my $toc = _github( $github );
+        my $toc = _github(
+              $src->{branch} eq 'master'
+            ? $github
+            : "$github/tree/$src->{branch}"
+        );
         $index .= "\n## $src->{description}\n\n";
         $toc   .= "\n# $src->{description}\n\n";
 
