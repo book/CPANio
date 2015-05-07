@@ -140,7 +140,7 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
 
         for my $file (@files) {
 
-            my $path = $file->relative($base);
+            my $path = my $relative = $file->relative($base);
             my $html = _github( "$github/blob/$src->{branch}/$path" );
 
             # target file
@@ -152,6 +152,14 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
             # content
             $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n};
             $html .= $process{$type}->( scalar $file->slurp );
+
+            # latest change
+            $html .= sprintf '<p><small>Document latest modification: <a href="%s/commit/%s">%s</a> by %s</small></p>',
+              $github,
+              $r->run( log => '--pretty=format:%H', '-1', '--', $relative ),
+              $r->run( log => '--pretty=format:%ad', '--date=iso', '-1', '--', $relative ),
+              $r->run( log => '--pretty=format:%an', '-1', '--', $relative ),
+              ;
 
             # pick the title
             my $title = $title{$type}->( scalar $file->slurp );
