@@ -11,5 +11,5 @@ BEGIN {
 
 use CPANio::App;
 
-CPANio::App->new( config => { ui => 'layout' } )
+CPANio::App->new( config => { ui => 'layout', docs_wrapper => 'document' } )
     ->run_if_script;
