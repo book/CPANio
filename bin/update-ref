@@ -146,6 +146,7 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
             $target->dir->mkpath if !-e $target->dir;
 
             # content
+            $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n};
             $html .= $process{$type}->( scalar $file->slurp );
 
             # pick the title
