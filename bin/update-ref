@@ -1,0 +1,181 @@
+#!/usr/bin/env perl
+use local::lib;
+use FindBin;
+use Path::Class;
+
+my $base;
+
+BEGIN {
+    unshift @INC, dir($FindBin::Bin)->parent->subdir('lib')->stringify;
+}
+
+use strict;
+use warnings;
+use YAML::Tiny;
+use Git::Repository;
+use Text::Markdown qw( markdown );
+use CPANio;
+
+# HELPER SUBROUTINES
+
+# build a regexp from a "glob" pattern
+sub _build_regexp {
+    my ( $base, $glob ) = @_;
+    my @glob = map {
+        $_ = quotemeta;
+        s{\\\*\\\*}{.*}g;
+        s{\\\*}{[^/]*}g;
+        s/\?/./g;
+        $_;
+    } ref $glob ? @$glob : ($glob);
+    $glob = join '|', @glob;
+    return qr/^\Q$base\E\/(?:$glob)$/;
+}
+
+sub _github {
+    return << "GITHUB";
+<a href="$_[0]">
+  <img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme.png">
+</a>
+GITHUB
+}
+
+# HTML-producing code
+my %process = (
+    md   => sub { markdown(shift) },
+);
+my %title = (
+    md => sub { my @headers = shift =~ /^# +(.*)/g; shift @headers; },
+);
+
+# YAML configuration file format:
+#
+#   publishing:
+#     sources:
+#       - description: <description of the document collection>
+#         repository: <repository url>
+#         branch: <repository branch> [master]
+#         subdir: <subdirectory of site/ref/>
+#         include: <glob pattern of files to include (or list thereof)> [*]
+#         exclude: <glob pattern of files to exclude (or list thereof)>
+#         recurse: <boolean to enable recursion> [0]
+
+my $config = YAML::Tiny->read( CPANio->base_dir->file('cpanio.yml') )->[0];
+my $doc_dir = CPANio->base_dir->subdir(qw( site docs ref ));
+my $git_dir = CPANio->base_dir->subdir(qw( site clones ));
+
+# MAIN LOOP
+
+my $index = "# CPAN Reference Documents\n\n";
+for my $src ( @{ $config->{publishing}{sources} } ) {
+
+    # clone the repository if it does not exist yet
+    my $base = $git_dir->subdir( $src->{subdir} );
+    if ( !-e $base ) {
+        Git::Repository->run( clone => $src->{repository}, $base );
+    }
+
+    my $r = Git::Repository->new( work_tree => $base );
+    next if !$r;
+
+    # update the repository
+    $r->run( 'checkout' => $src->{branch} //= 'master', { quiet => 1 } );
+    $r->run('pull');
+
+    # collect files
+    my @files;
+    if ( $src->{recurse} ) {
+        $base->recurse(
+            callback => sub {
+                my $item = shift;
+                return $item->PRUNE if $item->basename eq '.git';
+                push @files, $item if -f $item;
+            }
+        );
+    }
+    else {
+        @files = grep -f, $base->children( no_hidden => 1 );
+    }
+
+    # keep includes
+    my $include = _build_regexp( $base => $src->{include} // '*' );
+    @files = grep /$include/, @files;
+
+    # remove excludes
+    if ( my $exclude = $src->{exclude} // '' ) {
+        $exclude = _build_regexp( $base => $exclude );
+        @files = grep !/$exclude/, @files;
+    }
+
+    # sort files by creation date
+    @files =
+      map $_->[0],
+      sort { $a->[1] <=> $b->[1] }
+      map [ $_,
+        (
+            split / /,
+            $r->command(
+                log => ( '--pretty=format:%ad', '--date=raw', '--reverse' ),
+                '--', $_->relative($base)
+            )->stdout->getline
+          )[0] ],
+      @files;
+
+    # convert files to HTML
+    if (@files) {
+
+        # base github url for the project
+        my $github = $src->{repository};
+        $github =~ s{git\@github.com:}{https://github.com/};
+        $github =~ s{(?:/|\.git)$}{};
+
+        # table of content
+        my $toc = _github(
+              $src->{branch} eq 'master'
+            ? $github
+            : "$github/tree/$src->{branch}"
+        );
+        $index .= "\n## $src->{description}\n\n";
+        $toc   .= "\n# $src->{description}\n\n";
+
+        for my $file (@files) {
+
+            my $path = my $relative = $file->relative($base);
+            my $html = _github( "$github/blob/$src->{branch}/$path" );
+
+            # target file
+            $path =~ s/\.([^.]*)$/.html/;
+            my $type = $1;
+            my $target = $doc_dir->file( $src->{subdir}, $path );
+            $target->dir->mkpath if !-e $target->dir;
+
+            # content
+            $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n};
+            $html .= $process{$type}->( scalar $file->slurp );
+
+            # latest change
+            $html .= sprintf '<p><small>Document latest modification: <a href="%s/commit/%s">%s</a> by %s</small></p>',
+              $github,
+              $r->run( log => '--pretty=format:%H', '-1', '--', $relative ),
+              $r->run( log => '--pretty=format:%ad', '--date=iso', '-1', '--', $relative ),
+              $r->run( log => '--pretty=format:%an', '-1', '--', $relative ),
+              ;
+
+            # pick the title
+            my $title = $title{$type}->( scalar $file->slurp );
+            $toc   .= "- [$title]($path)\n";
+            $index .= "- [$title]($src->{subdir}/$path)\n";
+
+            # save the file
+            file($target)->spew($html);
+        }
+
+        # this subdir table of content
+        file( $doc_dir, $src->{subdir}, 'index.md')->spew( $toc );
+
+    }
+
+    # list of all reference documents
+    file( $doc_dir, 'index.md')->spew( $index);
+}
+

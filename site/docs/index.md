@@ -13,6 +13,6 @@ In the coming months, we'll build and grow the site.
 For now, you can enjoy
 a new version of the “[CPAN once-a-period](/board/once-a/)” [boards](/board/),
 feel the [pulse](/pulse/) of CPAN.io,
-and read a thorough [history of CPAN](/ref/history.html).
+and read various [CPAN reference documents](/ref/).
 
 — Your hosts, A<BOOK> & A<NEILB>

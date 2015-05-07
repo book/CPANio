@@ -16,8 +16,9 @@ has handler => (
 
 # default configuration
 sub default_config {
-    (   ui       => \"<html><body>\n[% content %]\n</body></html>",
-        base_dir => CPANio->base_dir->subdir('site'),
+    (   ui           => \"<html><body>\n[% content %]\n</body></html>",
+        docs_wrapper => \'[% content %]',
+        base_dir     => CPANio->base_dir->subdir('site'),
     );
 }
 

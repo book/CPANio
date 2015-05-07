@@ -1,0 +1,6 @@
+publishing:
+  sources:
+    - description: History of CPAN
+      repository: git@github.com:neilbowers/history-of-cpan.git
+      subdir: cpan
+      include: *.md

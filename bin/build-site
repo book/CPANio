@@ -33,6 +33,9 @@ if [ -z $DST ] ; then DST=cpan.io ; fi
 # make sure the local target directory exists
 if [ ! -e $DST ] ; then mkdir -p $DST ; fi
 
+# update the external documents
+$SRC/bin/update-ref
+
 # generate the static pages
 eval `perl -Mlocal::lib`
 wallflower \

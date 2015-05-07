@@ -21,6 +21,11 @@ pre {
     font-size: small;
 }
 
+div.document {
+    margin: auto;
+    max-width: 108ex;
+}
+
 div.selector {
     font-size: 18pt;
     color: #777;
