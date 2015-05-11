@@ -1,11 +1,11 @@
 publishing:
   sources:
     - description: History of CPAN
-      repository: git@github.com:neilbowers/history-of-cpan.git
+      repository: https://github.com/neilbowers/history-of-cpan.git
       subdir: cpan
       include: *.md
     - description: Perl Toolchain documents
-      repository: git@github.com:Perl-Toolchain-Gang/toolchain-site.git
+      repository: https://github.com/Perl-Toolchain-Gang/toolchain-site.git
       subdir: toolchain
       recurse: 1
       include: *.md
