@@ -150,7 +150,7 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
             $target->dir->mkpath if !-e $target->dir;
 
             # content
-            $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n};
+            $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n<hr />\n};
             $html .= $process{$type}->( scalar $file->slurp );
 
             # get the first and latest changes
@@ -160,9 +160,9 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
 
             # first and latest change
             chomp( @first, @latest );
-            $html .= "<p><small>\n";
+            $html .= "<hr /><p><small>\n";
             $html .= sprintf "Document created on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @first;
-            $html .= sprintf "<br />Document last modified on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @latest
+            $html .= sprintf "Document last modified on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @latest
               if "@latest" ne "@first";
             $html .= "</small></p>\n";
 
