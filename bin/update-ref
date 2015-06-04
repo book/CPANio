@@ -166,10 +166,17 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
               if "@latest" ne "@first";
             $html .= "</small></p>\n";
 
+            # stop at a resolution of one day
+            @first  = (split / /, $first[1] )[0];
+            @latest = ( split / /, $latest[1] )[0];
+            my $summary = "@first";
+            $summary .= " &ndash; @latest" if "@latest" ne "@first";
+            $summary = "<small>[$summary]</small>";
+
             # pick the title
             my $title = $title{$type}->( scalar $file->slurp );
-            $toc   .= "- [$title]($path)\n";
-            $index .= "- [$title]($src->{subdir}/$path)\n";
+            $toc   .= "- [$title]($path) $summary\n";
+            $index .= "- [$title]($src->{subdir}/$path) $summary\n";
 
             # save the file
             file($target)->spew($html);
