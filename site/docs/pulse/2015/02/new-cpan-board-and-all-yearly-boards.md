@@ -37,7 +37,7 @@ games, since 1995:
 
 - [weekly releases](/board/once-a/week/releases/years.html)
 - [weekly distributions](/board/once-a/week/distributions/years.html)
-- [weekly new-distributions](/board/once-a/week/new-distributions/years.html)
+- <s>weekly new-distributions</s> <small>(removed on May 5, 2015)</small>
 - [monthly releases](/board/once-a/month/releases/years.html)
 - [monthly distributions](/board/once-a/month/distributions/years.html)
 - [monthly new-distributions](/board/once-a/month/new-distributions/years.html)

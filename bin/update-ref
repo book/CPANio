@@ -150,21 +150,33 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
             $target->dir->mkpath if !-e $target->dir;
 
             # content
-            $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n};
+            $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n<hr />\n};
             $html .= $process{$type}->( scalar $file->slurp );
 
-            # latest change
-            $html .= sprintf '<p><small>Document latest modification: <a href="%s/commit/%s">%s</a> by %s</small></p>',
-              $github,
-              $r->run( log => '--pretty=format:%H', '-1', '--', $relative ),
-              $r->run( log => '--pretty=format:%ad', '--date=iso', '-1', '--', $relative ),
-              $r->run( log => '--pretty=format:%an', '-1', '--', $relative ),
-              ;
+            # get the first and latest changes
+            my $out = $r->command( log => '--pretty=format:%H!%ad!%an', '--date=iso', '--', $relative )->stdout;
+            my @latest = my @first = split /!/, scalar <$out>, 3;
+            @first = split /!/, $_, 3 while <$out>;
+
+            # first and latest change
+            chomp( @first, @latest );
+            $html .= "<hr /><p><small>\n";
+            $html .= sprintf "Document created on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @first;
+            $html .= sprintf "Document last modified on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @latest
+              if "@latest" ne "@first";
+            $html .= "</small></p>\n";
+
+            # stop at a resolution of one day
+            @first  = (split / /, $first[1] )[0];
+            @latest = ( split / /, $latest[1] )[0];
+            my $summary = "@first";
+            $summary .= " &ndash; @latest" if "@latest" ne "@first";
+            $summary = "<small>[$summary]</small>";
 
             # pick the title
             my $title = $title{$type}->( scalar $file->slurp );
-            $toc   .= "- [$title]($path)\n";
-            $index .= "- [$title]($src->{subdir}/$path)\n";
+            $toc   .= "- [$title]($path) $summary\n";
+            $index .= "- [$title]($src->{subdir}/$path) $summary\n";
 
             # save the file
             file($target)->spew($html);
