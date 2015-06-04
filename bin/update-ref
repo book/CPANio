@@ -153,13 +153,18 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
             $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n};
             $html .= $process{$type}->( scalar $file->slurp );
 
-            # latest change
-            $html .= sprintf '<p><small>Document latest modification: <a href="%s/commit/%s">%s</a> by %s</small></p>',
-              $github,
-              $r->run( log => '--pretty=format:%H', '-1', '--', $relative ),
-              $r->run( log => '--pretty=format:%ad', '--date=iso', '-1', '--', $relative ),
-              $r->run( log => '--pretty=format:%an', '-1', '--', $relative ),
-              ;
+            # get the first and latest changes
+            my $out = $r->command( log => '--pretty=format:%H!%ad!%an', '--date=iso', '--', $relative )->stdout;
+            my @latest = my @first = split /!/, scalar <$out>, 3;
+            @first = split /!/, $_, 3 while <$out>;
+
+            # first and latest change
+            chomp( @first, @latest );
+            $html .= "<p><small>\n";
+            $html .= sprintf "Document created on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @first;
+            $html .= sprintf "<br />Document last modified on <a href=\"%s/commit/%s\">%s</a> by %s.\n", $github, @latest
+              if "@latest" ne "@first";
+            $html .= "</small></p>\n";
 
             # pick the title
             my $title = $title{$type}->( scalar $file->slurp );
