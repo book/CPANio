@@ -66,7 +66,9 @@ my $git_dir = CPANio->base_dir->subdir(qw( site clones ));
 
 # MAIN LOOP
 
-my $index = "# CPAN Reference Documents\n\n";
+my $desc = "<small>The dates following the document title are creation date and latest modification date.</small>\n\n";
+my $index = "# CPAN Reference Documents\n\n$desc";
+
 for my $src ( @{ $config->{publishing}{sources} } ) {
 
     # clone the repository if it does not exist yet
@@ -137,6 +139,7 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
         );
         $index .= "\n## $src->{description}\n\n";
         $toc   .= "\n# $src->{description}\n\n";
+        $toc   .= $desc;
 
         for my $file (@files) {
 
