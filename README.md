@@ -1,7 +1,7 @@
 # CPAN.io
 
 This repository contains everything needed to build the
-[CPAN.io](http://cpan,io/) web site.
+[CPAN.io](http://cpan.io/) web site.
 
 The database is created with:
 
