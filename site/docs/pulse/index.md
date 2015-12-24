@@ -5,6 +5,7 @@ gamification, or about CPAN.io itself.
 
 ## 2015
 
+- 2015-12-24 [CPAN.io as a reference site](2015/12/cpan-io-as-a-reference.html)
 - 2015-02-19 [New CPAN board, and all yearly boards at a glance](2015/02/new-cpan-board-and-all-yearly-boards.html)
 
 ## 2014
