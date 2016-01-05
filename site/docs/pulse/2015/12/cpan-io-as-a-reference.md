@@ -13,13 +13,15 @@ proper [yearly boards](/board/once-a/week/releases/years.html) was a nice stretc
 When A<NEILB> started to work on his history of CPAN, it was immediately
 obvious (to A<BOOK>) that it belonged to CPAN.io. Neil having started in a
 different repository, the first step was to copy the file over. Trouble
-started when people sent patches against the CPANio repository, instead
-of the cpan-history repository.
+started when people [sent](https://github.com/book/CPANio/issues/23)
+[patches](https://github.com/book/CPANio/issues/24) against the CPANio
+repository, instead of the cpan-history repository.
 
-The solution to that is obviously DRY (Don't Repeat Yourself). If the
-authoritative source for the "history of CPAN" document is that other
-repository, let it be. Don't try to bring everything into the main CPANio
-repository.
+The solution to that is obviously DRY (Don't Repeat Yourself). If
+the authoritative source for the "history of CPAN" document is
+[that other repository](https://github.com/neilb/history-of-cpan/),
+let it be.  Don't try to bring everything into the main [CPANio
+repository](https://github.com/book/CPANio/).
 
 ## Passing by reference instead of copying
 
