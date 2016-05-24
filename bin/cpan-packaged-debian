@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use DBI;
+use JSON;
+use File::Spec;
+use File::Temp qw( tempfile );
+use File::Path qw( make_path );
+use List::MoreUtils qw( uniq );
+use Path::Class;
+use CPAN::DistnameInfo;
+use CPAN::Common::Index::Mirror;
+
+my $target = shift;
+$target ||= 'cpan.io';
+$target = dir($target);
+my $datadir = $target->subdir('dists-in');
+$datadir->mkpath;
+
+# handle the CPAN::Common::Index::Mirror cache
+my $cache_dir = File::Spec->catdir( File::Spec->tmpdir, "cpan-$<" );
+make_path $cache_dir unless -e $cache_dir;
+my $index = CPAN::Common::Index::Mirror->new( { cache => $cache_dir } );
+my $cache = $index->cached_package;
+if ( time - ( stat $cache )[9] > 24 * 60 * 60 ) {
+    $index->refresh_index;
+}
+
+# connect to the database
+my $dbh = DBI->connect( "dbi:Pg:host=public-udd-mirror.xvm.mit.edu;dbname=udd",
+    'public-udd-mirror', 'public-udd-mirror' );
+
+my @cpan_hosts = qw(
+  backpan.cpan.org
+  backpan.perl.org
+  cpan.metacpan.org
+  cpan.noris.de
+  cpan.org
+  cpan.perl.org
+  search.cpan.org
+  www.cpan.org
+  www.perl.com
+);
+my $host_rx =
+  '^(https?|ftp)://(' . join( '|', map { s/\./\\./; $_ } @cpan_hosts ) . ')/';
+
+# special cases
+my %skip = map +( $_ => 1 ), qw(
+  libbssolv-perl
+);
+my %alias = (
+    'datapager'   => 'data-pager',
+    'html-format' => 'html-formatter',
+);
+
+sub dist_for {
+    my ( $source, $url ) = @_;
+
+    my $dist = CPAN::DistnameInfo->new($url);
+    if ( $dist->dist ) {
+        return $dist->dist;
+    }
+    elsif ( $source =~ /^lib(.*)-perl$/ ) {
+        my $query = $alias{$1} // $1;
+        my @dist = uniq grep defined,
+          map { CPAN::DistnameInfo->new($_)->dist } uniq map $_->{uri},
+          $index->search_packages( { dist => qr{(?i).*/$query-[0-9]} } );
+        return shift @dist if @dist == 1;
+    }
+
+    return;
+}
+
+# multiple queries are needed
+my @sql = (
+
+    # packages with upstream identified as CPAN
+q{select u.source, u.upstream_url from upstream_metadata um join upstream u on um.source = u.source where um.key='Archive' and um.value='CPAN'},
+
+    # packages which upstream URL pointing to CPAN
+qq{select source, upstream_url from upstream where upstream_url ~ '$host_rx'},
+);
+
+# collect source modules
+my %dist;
+for my $sql (@sql) {
+    my $sth = $dbh->prepare($sql);
+    $sth->execute();
+
+    # map source to CPAN distro
+    while ( my ( $source, $url ) = $sth->fetchrow ) {
+        next if $skip{$source};
+        if ( my $dist = dist_for( $source, $url ) ) {
+            $dist{$dist} = $source;
+        }
+        else {
+            print "# FAIL: $source ", $url // '<undef>', "\n";
+        }
+    }
+}
+
+# save as JSON
+my ( $fh, $filename ) = tempfile( DIR => $datadir  );
+print $fh JSON->new->pretty->canonical->encode( \%dist );
+close $fh;
+rename $filename, $datadir->file('debian.json');
