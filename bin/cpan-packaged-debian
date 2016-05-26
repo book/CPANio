@@ -105,4 +105,5 @@ for my $sql (@sql) {
 my ( $fh, $filename ) = tempfile( DIR => $datadir  );
 print $fh JSON->new->pretty->canonical->encode( \%dist );
 close $fh;
+chmod 0644, $filename;
 rename $filename, $datadir->file('debian.json');
