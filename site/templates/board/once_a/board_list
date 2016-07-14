@@ -1,3 +1,4 @@
+<a name="tables"></a>
 <table width="100%" align="center">
     <tr valign="top">[% prev_game = boards.0.game %]
         [% FOREACH board IN boards %]
