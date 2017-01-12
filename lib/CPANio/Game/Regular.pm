@@ -118,7 +118,7 @@ sub _compute_boards_current {
     }
 
     # sort chains
-    @entries = sort { $b->{count} <=> $a->{count} || $a->{fallen} <=> $b->{fallen} }
+    @entries = sort { $b->{count} <=> $a->{count} || $a->{author} cmp $b->{author} || $a->{fallen} <=> $b->{fallen} }
         grep $_->{count} >= 2,
         @entries;
 
@@ -157,7 +157,7 @@ sub _compute_boards_alltime {
     # sort chains, and keep only one per author
     my %seen;
     @entries = grep $seen{ $_->{author} }++ ? $_->{safe} || $_->{active} || $_->{fallen} : 1,
-        sort { $b->{count} <=> $a->{count} }
+        sort { $b->{count} <=> $a->{count} || $a->{author} cmp $b->{author} }
         grep $_->{count} >= 2,
         @entries;
 
@@ -205,7 +205,7 @@ sub _compute_boards_yearly {
         # sort chains, and keep only one per author
         my %seen;
         @entries = grep $seen{ $_->{author} }++ ? $_->{safe} || $_->{active} || $_->{fallen} : 1,
-            sort { $b->{count} <=> $a->{count} }
+            sort { $b->{count} <=> $a->{count} || $a->{author} cmp $b->{author} }
             grep $_->{count} >= 2,
             @entries;
 
