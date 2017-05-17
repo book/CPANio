@@ -25,13 +25,17 @@ done
 
 # our directories
 SRC=`readlink -f $(dirname $0)/..`
-DST=$1
+LNK=$1
 
 # default
-if [ -z $DST ] ; then DST=cpan.io ; fi
+if [ -z $LNK ] ; then LNK=cpan.io ; fi
 
 # make sure the local target directory exists
-if [ ! -e $DST ] ; then mkdir -p $DST ; fi
+if [ ! -e `dirname $LNK` ] ; then mkdir -p `dirname $LNK` ; fi
+
+# build the target for site generation
+DST=$LNK-`date -u +%Y%m%d-%H%M%S`
+mkdir -p $DST
 
 # update the external documents
 $SRC/bin/update-ref
@@ -43,3 +47,9 @@ wallflower \
     --include $SRC/lib \
     --destination $DST \
     --application $SRC/bin/cpanio.cgi
+
+# symlink dance
+ln -s -L -f $DST $LNK
+
+# drop all older versions
+rm -rf `ls -d $LNK-* | sort -r | tail +3`
