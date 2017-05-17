@@ -30,6 +30,5 @@ to be run if modified.
 The production cron setup looks like this:
 
     # cpan.io
-     1 * * * * /home/book/git/d/CPANio/bin/update-boards ; /home/book/git/d/CPANio/bin/build-site /home/book/www/cpan.io/
-    17 2 * * * /home/book/git/d/CPANio/bin/cpan-packaged-debian /home/book/www/cpan.io/
+    1 * * * * /home/book/git/d/CPANio/bin/update-boards ; /home/book/git/d/CPANio/bin/build-site /home/book/www/cpan.io/
 
