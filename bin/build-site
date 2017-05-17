@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 USAGE="Usage: $0 [ -v ] [ <directory> ]"
 QUIET=--quiet
 
@@ -23,9 +23,9 @@ while true ; do
     esac
 done
 
-# our directories
+# our directories (no trailing /)
 SRC=`readlink -f $(dirname $0)/..`
-LNK=$1
+LNK=`dirname $1`/`basename $1`
 
 # default
 if [ -z $LNK ] ; then LNK=cpan.io ; fi
@@ -49,7 +49,8 @@ wallflower \
     --application $SRC/bin/cpanio.cgi
 
 # symlink dance
-ln -s -L -f $DST $LNK
+rm $LNK
+ln -s $DST $LNK
 
 # drop all older versions
-rm -rf `ls -d $LNK-* | sort -r | tail +3`
+rm -rf `ls -d $LNK-* | sort -r | tail -n +3`
