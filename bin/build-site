@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 USAGE="Usage: $0 [ -v ] [ <directory> ]"
 QUIET=--quiet
 
