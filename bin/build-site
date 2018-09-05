@@ -3,7 +3,7 @@ USAGE="Usage: $0 [ -v ] [ <directory> ]"
 QUIET=--quiet
 
 # command-line options
-OPTS=`getopt -o v -n "$0" -- "$@"`
+OPTS=`getopt -o vj: -n "$0" -- "$@"`
 if [ $? != 0 ] ; then
     echo $USAGE >&2
     exit 1
@@ -15,6 +15,9 @@ while true ; do
         -v)
             QUIET=
             shift ;;
+       -j)
+            PARALLEL="--parallel $2"
+            shift 2;;
         --) shift ; break ;;
         *)
             echo "Internal error!" >&2
@@ -44,6 +47,7 @@ $SRC/bin/update-ref
 eval `perl -Mlocal::lib`
 wallflower \
     $QUIET \
+    $PARALLEL \
     --include $SRC/lib \
     --destination $DST \
     --application $SRC/bin/cpanio.cgi
