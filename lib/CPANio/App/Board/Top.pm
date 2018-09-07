@@ -5,13 +5,14 @@ use Plack::Response;
 use CPANio::Schema;
 use CPANio::Bins;
 use List::MoreUtils qw( uniq );
+use HTTP::Date qw( str2time );
 
 sub _build_final_dispatcher {
     sub () { }
 }
 
 sub dispatch_request {
-    my ($self) = @_;
+    my ( $self, $env ) = @_;
     my $schema = $CPANio::schema;
     my $tt     = $self->config->{template};
 
@@ -29,6 +30,11 @@ sub dispatch_request {
     # get the date of the latest release considered
     my $latest_release = $schema->resultset('Timestamps')
         ->find( { game => 'backpan-release' } )->latest_update;
+
+    # nothing changed
+    return [ 304, [ 'Content-Type' => 'text/html' ], [] ]
+      if $env->{HTTP_IF_MODIFIED_SINCE}
+      && $latest_release < str2time( $env->{HTTP_IF_MODIFIED_SINCE} );
 
     # compute common search attributes
     my %attr;

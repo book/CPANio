@@ -5,6 +5,7 @@ use Web::Simple;
 use Plack::Response;
 use Template;
 use Path::Class;
+use HTTP::Date qw( str2time );
 
 use CPANio;
 
@@ -53,7 +54,7 @@ sub dispatch_request {
 
     # we're a static site, so we only do GET
     sub (GET) {
-        my ($self) = @_;
+        my ( $self, $env ) = @_;
 
         # handler for static resources
         sub (/**.*) {
@@ -65,6 +66,9 @@ sub dispatch_request {
             return if !$file;
             return Plack::Response->new(403)->finalize
                 if !$static_dir->contains($file);
+            return [ 304, [ 'Content-Type' => 'text/html' ], [] ]
+              if $env->{HTTP_IF_MODIFIED_SINCE}
+              && (stat $file)[9] < str2time( $env->{HTTP_IF_MODIFIED_SINCE} );
             return [ 200, [], $file->openr ];
         },
 

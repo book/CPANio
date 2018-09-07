@@ -4,6 +4,7 @@ use Web::Simple;
 use Plack::Response;
 use Path::Class;
 use Text::Markdown::PerlExtensions 'markdown';
+use HTTP::Date qw( str2time );
 
 my %process = (
     md   => sub { markdown(shift) },
@@ -11,7 +12,7 @@ my %process = (
 );
 
 sub dispatch_request {
-    my ($self) = @_;
+    my ( $self, $env ) = @_;
 
     # check the configuration
     my $docs_dir = dir( $self->config->{docs_dir} );
@@ -37,6 +38,9 @@ sub dispatch_request {
         return if !$file;
         return Plack::Response->new(403)->finalize
             if !$docs_dir->contains($file);
+        return [ 304, [ 'Content-Type' => 'text/html' ], [] ]
+          if $env->{HTTP_IF_MODIFIED_SINCE}
+          && (stat $file)[9] < str2time( $env->{HTTP_IF_MODIFIED_SINCE} );
 
         my $tt = $self->config->{template};
         $tt->process(

@@ -2,6 +2,7 @@ package CPANio::App::Board::Regular;
 
 use Web::Simple;
 use Plack::Response;
+use HTTP::Date qw( str2time );
 
 use CPANio;
 use CPANio::Schema;
@@ -9,9 +10,8 @@ use CPANio::Schema;
 sub _build_final_dispatcher { sub () {} }
 
 sub dispatch_request {
-    my ($self) = @_;
+    my ( $self, $env ) = @_;
     my $schema = $CPANio::schema;
-
     my $order_by
         = [ { -asc => 'rank' }, { -desc => 'count' }, { -asc => 'author' } ];
 
@@ -24,6 +24,11 @@ sub dispatch_request {
     my $latest_release =
       $schema->resultset('Timestamps')
       ->find( { game => 'backpan-release' } )->latest_update;
+
+    # nothing changed
+    return [ 304, [ 'Content-Type' => 'text/html' ], [] ]
+      if $env->{HTTP_IF_MODIFIED_SINCE}
+      && $latest_release < str2time( $env->{HTTP_IF_MODIFIED_SINCE} );
 
     # show every current competition
     sub (/) {
