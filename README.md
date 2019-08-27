@@ -3,6 +3,27 @@
 This repository contains everything needed to build the
 [CPAN.io](http://cpan.io/) web site.
 
+## Install dependencies
+
+Simply use `cpanfile` to install all dependencies
+
+`cpanm --installdeps .` 
+
+
+... Or play step by step if you prefer :
+
+CPAN modules needed before the **database creation** : `$ cpanm Path::Class DBIx::Class::Schema SQL::Translator`
+
+CPAN modules needed before **populating the database (boards)** : `$ cpanm BackPAN::Index DateTime`
+
+CPAN modules needed before **populating the database (refs)** : `$ cpanm YAML::Tiny Git::Repository`
+
+CPAN modules needed before **running the development website** : `$ cpanm Plack Web::Simple Template Text::Markdown::PerlExtensions HTTP::Headers`
+
+CPAN modules needed before **generating the production version** : `$ cpanm App::Wallflower`
+
+## Setup the environment
+
 The database is created with:
 
     $ bin/create-database
@@ -11,14 +32,20 @@ It is then populated with:
 
     $ bin/update-boards
 
+## Run the development website
+
 While developing, it's possible to test the website with a browser by
 running `plackup`:
 
     $ plackup bin/cpanio.cgi
 
+## Generate production version
+
 And the static website is itself built with:
 
-    $ bin/build-site
+    $ bin/build-site .
+
+## More
 
 The live site on <http://cpan.io/> is generated hourly by running the
 `bin/update-boards` and `bin/build-site` commands in a cron job.

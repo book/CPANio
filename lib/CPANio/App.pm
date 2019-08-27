@@ -6,6 +6,7 @@ use Plack::Response;
 use Template;
 use Path::Class;
 use HTTP::Date qw( str2time );
+use HTTP::Headers;
 
 use CPANio;
 
