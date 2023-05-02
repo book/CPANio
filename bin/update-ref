@@ -156,6 +156,10 @@ for my $src ( @{ $config->{publishing}{sources} } ) {
             $html .= qq{<p><a href="/ref/$src->{subdir}/">$src->{description}</a><p>\n<hr />\n};
             $html .= $process{$type}->( scalar $file->slurp );
 
+	    # fix internal links
+	    $html =~ s{<a ([^>]*)href="((?!http)[^"]+)\.md"([^>]*)>}
+	              {<a $1href="$2.html"$3>};
+
             # get the first and latest changes
             my $out = $r->command( log => '--pretty=format:%H!%ad!%an', '--date=iso', '--', $relative )->stdout;
             my @latest = my @first = split /!/, scalar <$out>, 3;
