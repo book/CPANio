@@ -21,6 +21,11 @@ pre {
     font-size: small;
 }
 
+blockquote {
+    padding: 0 1em;
+    border-left: .25em solid lightgray;
+}
+
 div.document {
     margin: auto;
     max-width: 108ex;
